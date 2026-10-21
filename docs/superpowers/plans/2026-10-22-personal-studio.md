@@ -28,4 +28,4 @@
 - [x] Serve dist on localhost, inspect desktop and mobile at 390px and 320px in Chrome, click every language/filter and player activation, verify 404 and fallback, inspect overflow and console errors.
 - [x] Obtain independent specification and quality review; fix material findings and rerun affected checks.
 - [x] Update README with actual behavior and verification.
-- [ ] Commit feature branch, push and create an attached PR. Leave production merge to explicit approval.
+- [x] Commit feature branch, push and create an attached PR: https://github.com/dKosarevsky/kosarevsky.dev/pull/1. Production merge remains subject to explicit approval.
