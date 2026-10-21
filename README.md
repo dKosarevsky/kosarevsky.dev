@@ -1,44 +1,44 @@
 # kosarevsky.dev
 
-Personal homepage with selected projects and games. Static HTML, CSS, and JavaScript; no package dependencies. English is the default language.
+A personal studio for software, games, agent architecture and AI-assisted music as Anima Dao. Static HTML, CSS and JavaScript modules; no package dependencies.
 
-English, Russian, and Spanish are included. The site remembers language and motion preferences and supports direct `?lang=ru` / `?lang=es` links. A projected 3D particle knot responds to pointer movement and clicks, with a warp control and motion toggle. Rendering pauses off screen and in background tabs. The whole site is self-contained, without third-party fonts, analytics, or runtime scripts.
+## Content and behavior
 
-See [PROJECTS.md](PROJECTS.md) for the six selected projects and editorial sources. Edit `assets/projects.js` and `assets/i18n.js` to maintain the collection and translations.
+- Six selected projects: A MOVE AGO, Agent Architecture, Salvo, Aximo, albu-mcp and ajpegli. The first two have larger cards; the older four projects remain under Earlier work.
+- English is the default; Russian and Simplified Chinese are available through the language buttons or `?lang=ru` / `?lang=zh`. Unsupported language links and saved Spanish preferences fall back to English. Chinese uses `lang="zh-Hans"`.
+- Language and motion choices are saved locally when storage is available. The interactive particle knot responds to the pointer, clicks and warp control; rendering pauses when offscreen or in a background tab and respects reduced motion.
+- Anima Dao includes Spotify and YouTube Music links. Spotify receives no request until the visitor clicks Load Spotify player. The embedded artist player does not autoplay; available playback depends on Spotify. Direct links remain visible if the embed is blocked.
+- No third-party fonts, analytics or runtime project API. Local project previews are lazy-loaded.
 
-**Publication status:** the local site and GitHub Pages configuration are prepared. A successful production deployment has not yet been verified.
+[PROJECTS.md](PROJECTS.md) records public sources and editorial limits. Edit `assets/projects.js` and `assets/i18n.js` for projects and translations. The 404 page has its own small dictionary.
 
-Local validation covers translation completeness, project/filter data, asset paths, anchors and JavaScript syntax. A connected browser was unavailable in the authoring session; responsive layouts and visual effects still need a real-browser review before calling browser QA complete.
-
-## Run locally
+## Local development
 
 Use Node.js 22+ and Python 3:
 
 ```sh
 npm run check
 npm run build
-npm run dev
+python3 -m http.server 4173 --directory dist --bind 127.0.0.1
 ```
 
-Open <http://localhost:4173>. The build copies only public site files into `dist/`.
+Open <http://localhost:4173>. The build copies only public files into `dist/`; documentation, tests and QA screenshots are excluded. `npm run dev` serves the source directory for development.
 
-## Publish
+## Validation
 
-The target is a separate public repository, `dKosarevsky/kosarevsky.dev`. Authenticate GitHub CLI as `dKosarevsky`, commit the site on `main`, then run:
+`npm run check` validates complete locale dictionaries, locale fallback and precedence, project/filter data, public source owners, local previews, anchors, external link attributes, JavaScript syntax, payload size, and motion/accessibility hooks. It also runs the particle renderer lifecycle checks. Browser review covers desktop/mobile layout, language/filter transitions, the music player, 404, console errors and horizontal overflow.
 
-```sh
-bash scripts/publish.sh
-```
+## Publication
 
-The script checks authentication and repository history, creates the repository when absent, pushes `main`, configures Pages to use GitHub Actions, assigns `kosarevsky.dev`, and requests deployment. It refuses unrelated origins or divergent remote history. It does not change DNS.
+Repository: <https://github.com/dKosarevsky/kosarevsky.dev>. Production: <https://kosarevsky.dev/>.
 
-Subsequent pushes to `main` run validation, build `dist/`, and deploy through `.github/workflows/pages.yml`. Check the Actions result and the live site before considering a publication complete.
+Changes are prepared on feature branches and reviewed through pull requests. The GitHub Actions workflow checks and builds pull requests without deploying them. A push to `main` or a manual workflow run checks, builds and deploys `dist/` to GitHub Pages. Verify the Actions result and the live page after deployment.
 
-## Domain
+The initial version was deployed with HTTPS and both apex/www verified on 2026-10-22. This studio refresh is a feature-branch update until merged. DNS does not need changing for content releases.
 
-Assign `kosarevsky.dev` in repository **Settings → Pages → Custom domain** before changing DNS. The publish script performs that Pages setting through the API. With an Actions deployment, the `CNAME` file alone does not configure the domain.
+## Domain configuration
 
-At the domain's DNS provider, point the apex to GitHub Pages:
+GitHub Pages uses custom domain `kosarevsky.dev` with Enforce HTTPS enabled. Cloudflare records are DNS-only:
 
 | Name | Type | Value |
 | --- | --- | --- |
@@ -48,6 +48,4 @@ At the domain's DNS provider, point the apex to GitHub Pages:
 | `@` | A | `185.199.111.153` |
 | `www` | CNAME | `dkosarevsky.github.io` |
 
-Keep unrelated mail, verification, and project subdomain records. An apex ALIAS/ANAME pointing to `dkosarevsky.github.io` is an alternative to the A records. Once GitHub has issued the certificate, enable **Enforce HTTPS** in Pages settings.
-
-Current DNS and certificate readiness have not been verified. See the official [custom domain guide](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site) and [Pages API documentation](https://docs.github.com/en/rest/pages/pages).
+Preserve unrelated mail, verification and project subdomain records. See the [GitHub custom domain guide](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
