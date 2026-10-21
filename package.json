@@ -1,0 +1,15 @@
+{
+  "name": "kosarevsky-dev",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal projects and games at kosarevsky.dev",
+  "scripts": {
+    "check": "node --experimental-vm-modules scripts/check.mjs",
+    "build": "node scripts/build.mjs",
+    "dev": "python3 -m http.server 4173"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
