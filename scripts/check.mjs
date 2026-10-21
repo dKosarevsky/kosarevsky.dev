@@ -15,23 +15,29 @@ const notFound = await read('404.html');
 assert.match(notFound, /<html lang="en">/, 'The 404 page must be in English');
 assert.doesNotMatch(html + notFound + app + css, /data-(?:lang|i18n)\b|kosarevsky-language|lang=(?:ru|zh)|(?:i18n|locale)\.js/, 'Language switching must be removed');
 assert.doesNotMatch(html + notFound + app, /[\p{Script=Cyrillic}\p{Script=Han}]/u, 'Public copy must be English only');
-assert.equal(projects.length, 6);
-assert.deepEqual(projects.map((p) => p.id), ['chess', 'book', 'salvo', 'aximo', 'mcp', 'jpeg']);
+assert.equal(projects.length, 8);
+assert.deepEqual(projects.map((p) => p.id), ['chess', 'book', 'fortran', 'teleport', 'salvo', 'aximo', 'mcp', 'jpeg']);
+assert.match(html, /<sup>08<\/sup>/);
+assert.match(html, /id="project-count">08 PROJECTS</);
 assert.equal(new Set(projects.map((p) => p.id)).size, projects.length, 'Project IDs must be unique');
 for (const project of projects) {
-  assert.ok(['tools', 'games', 'ai'].includes(project.category));
+  assert.ok(['tools', 'games', 'ai', 'research'].includes(project.category));
   assert.ok(!/hackathon/i.test(JSON.stringify(project)), 'Hackathon project detected');
   assert.equal(typeof project.description, 'string', `${project.id}: expected one English description`);
   assert.ok(project.description.trim(), `${project.id}: description is empty`);
   assert.doesNotMatch(project.description, /[\p{Script=Cyrillic}\p{Script=Han}]/u);
-  assert.ok(['play', 'read', 'launch', 'source'].includes(project.action));
-  assert.equal(new URL(project.source).hostname, 'github.com');
-  assert.ok(/^\/(dKosarevsky|agent-axiom)\//.test(new URL(project.source).pathname));
-  assert.equal(new URL(project.url).protocol, 'https:');
+  if (project.private) {
+    assert.ok(!project.url && !project.source, `${project.id}: private repositories must not be linked publicly`);
+  } else {
+    assert.ok(['play', 'read', 'launch', 'source'].includes(project.action));
+    assert.equal(new URL(project.source).hostname, 'github.com');
+    assert.ok(/^\/(dKosarevsky|agent-axiom)\//.test(new URL(project.source).pathname));
+    assert.equal(new URL(project.url).protocol, 'https:');
+  }
   if (project.preview) await access(path.join(root, project.preview));
 }
 assert.equal(filterProjects('all').length, projects.length);
-for (const category of ['tools', 'games', 'ai']) {
+for (const category of ['tools', 'games', 'ai', 'research']) {
   assert.ok(filterProjects(category).length > 0);
   assert.ok(filterProjects(category).every((p) => p.category === category));
 }

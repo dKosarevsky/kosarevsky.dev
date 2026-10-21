@@ -38,8 +38,10 @@ function renderProjects() {
     card.className = `project-card${project.featured ? ' featured' : ''}`;
     card.dataset.project = project.id;
     const action = actionLabels[project.action];
-    const visual = externalLink(project.url, '', `card-visual visual-${project.id}`);
-    visual.setAttribute('aria-label', `${action}: ${project.name}`);
+    const visualClass = `card-visual visual-${project.id}`;
+    const visual = project.url ? externalLink(project.url, '', visualClass) : document.createElement('div');
+    visual.className = visualClass;
+    if (project.url) visual.setAttribute('aria-label', `${action}: ${project.name}`);
     if (project.preview) {
       const preview = document.createElement('img');
       preview.src = project.preview;
@@ -63,24 +65,32 @@ function renderProjects() {
     meta.textContent = project.tags.join(' / ');
     const heading = document.createElement('h3');
     heading.id = `project-${project.id}`;
-    heading.append(externalLink(project.url, project.name));
+    heading.append(project.url ? externalLink(project.url, project.name) : project.name);
     card.setAttribute('aria-labelledby', heading.id);
     const description = document.createElement('p');
     description.textContent = project.description;
     const links = document.createElement('div');
     links.className = 'card-links';
-    const mainLink = externalLink(project.url, `${action} ↗`);
-    mainLink.setAttribute('aria-label', `${action}: ${project.name}`);
-    links.append(mainLink);
-    if (project.url !== project.source) {
+    if (project.url) {
+      const mainLink = externalLink(project.url, `${action} ↗`);
+      mainLink.setAttribute('aria-label', `${action}: ${project.name}`);
+      links.append(mainLink);
+    }
+    if (project.source && project.url !== project.source) {
       const sourceLink = externalLink(project.source, 'GitHub ↗', 'source');
       sourceLink.setAttribute('aria-label', `Source code: ${project.name}`);
       links.append(sourceLink);
-    } else {
+    } else if (project.source) {
       const sourceLabel = document.createElement('span');
       sourceLabel.className = 'source';
       sourceLabel.textContent = 'GitHub';
       links.append(sourceLabel);
+    }
+    if (project.private) {
+      const status = document.createElement('span');
+      status.className = 'source';
+      status.textContent = 'Private project';
+      links.append(status);
     }
     body.append(meta, heading, description, links);
     card.append(visual, body);

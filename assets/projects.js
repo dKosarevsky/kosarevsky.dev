@@ -1,4 +1,4 @@
-/** Curated public projects. Source notes: PROJECTS.md. No live API dependency. */
+/** Curated portfolio projects. Source notes: PROJECTS.md. No live API dependency. */
 export const projects = [
   {
     id: 'chess', name: 'A MOVE AGO', category: 'games', tags: ['CHESS', 'PUZZLE', 'DAILY'],
@@ -17,6 +17,20 @@ export const projects = [
     source: 'https://github.com/agent-axiom/agent-arch',
     url: 'https://agent-axiom.github.io/agent-arch/',
     description: 'A practical book on AI agent architecture. Read it online and use it to design your own systems.',
+  },
+  {
+    id: 'fortran', name: 'microGPT in Fortran', category: 'ai', tags: ['FORTRAN', 'GPT', 'FROM SCRATCH'],
+    featured: true,
+    private: true,
+    preview: './assets/previews/fortran.svg',
+    description: 'A tiny GPT built in modern Fortran. Train a character-level model, save it, and generate new names.',
+  },
+  {
+    id: 'teleport', name: 'Teleport Research', category: 'research', tags: ['QUANTUM INFORMATION', 'PHYSICS', 'RESEARCH'],
+    featured: true,
+    private: true,
+    preview: './assets/previews/teleport.svg',
+    description: 'An early research project on quantum information transfer and spacetime shortcuts. Starting with a literature review and a plan for reproducible work.',
   },
   {
     id: 'salvo', name: 'Salvo', category: 'games', tags: ['BATTLESHIP', 'MULTIPLAYER', 'AGENTS'],

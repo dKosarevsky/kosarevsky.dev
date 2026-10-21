@@ -4,7 +4,7 @@ A personal studio for software, games, agent architecture and AI-assisted music 
 
 ## Content and behavior
 
-- Six selected projects: A MOVE AGO, Agent Architecture, Salvo, Aximo, albu-mcp and ajpegli. The first two have larger cards; the older four projects remain under Earlier work.
+- Eight selected projects: A MOVE AGO, Agent Architecture, microGPT in Fortran, Teleport Research, Salvo, Aximo, albu-mcp and ajpegli. The first four have larger cards. The Fortran and physics projects currently have private source repositories, so their cards show short descriptions and a Private project label. The older four projects remain under Earlier experiments.
 - The site and 404 page are English only. Old language links and saved language preferences no longer change the page.
 - Motion choices are saved locally when storage is available. The interactive particle knot responds to the pointer, clicks and warp control; rendering pauses when offscreen or in a background tab and respects reduced motion.
 - Anima Dao includes Spotify and YouTube Music links. Spotify receives no request until the visitor clicks Load Spotify player. The embedded artist player does not autoplay; available playback depends on Spotify. Direct links remain visible if the embed is blocked.
