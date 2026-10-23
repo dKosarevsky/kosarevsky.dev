@@ -35,7 +35,7 @@ img { display: block; max-width: 100%; }
 .skip { position: fixed; top: -100px; left: 20px; z-index: 50; padding: 15px; background: var(--lime); color: var(--bg); }
 .skip:focus { top: 10px; }
 
-/* Header and language controls */
+/* Header */
 .header { display: flex; align-items: center; justify-content: space-between; gap: 24px; min-height: 100px; border-bottom: 1px solid var(--line); }
 .brand { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; white-space: nowrap; font-size: 19px; font-weight: 700; letter-spacing: -.6px; }
 .brand-mark { width: 37px; color: var(--lime); font-size: 31px; line-height: 38px; letter-spacing: -3px; }
@@ -43,11 +43,6 @@ img { display: block; max-width: 100%; }
 .main-nav { display: flex; align-items: center; gap: 28px; font-size: 14px; }
 .main-nav a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; color: #bac2b3; transition: color .2s; }
 .main-nav a:hover, .text-link:hover { color: var(--lime); }
-.header-tools { display: flex; align-items: center; gap: 24px; }
-.languages { display: flex; gap: 2px; }
-.languages button { min-width: 44px; padding: 10px 7px; border: 1px solid transparent; color: var(--muted); font-family: var(--mono); font-size: 11px; }
-.languages button:hover { color: var(--fg); }
-.languages button[aria-pressed=true] { border-color: #52623f; color: var(--lime); background: #c8ff6406; }
 .github-top { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; font-family: var(--mono); font-size: 12px; }
 .github-top span { color: var(--lime); }
 
@@ -116,7 +111,9 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
 .card-visual > div { width: 100%; height: 100%; }
 .card-visual:focus-visible { z-index: 3; outline-offset: -4px; }
 .project-preview { width: 100%; height: 100%; object-fit: cover; object-position: center top; transition: transform .35s ease; }
-.visual-chess .project-preview, .visual-salvo .project-preview { object-fit: contain; object-position: center; }
+.visual-chess .project-preview, .visual-salvo .project-preview, .visual-fortran .project-preview, .visual-teleport .project-preview { object-fit: contain; object-position: center; }
+.visual-fortran { background: #101b22; }
+.visual-teleport { background: #171521; }
 .card-visual:hover .project-preview { transform: scale(1.025); }
 .card-number { position: absolute; top: 14px; left: 14px; z-index: 2; padding: 5px 7px; background: #080a09dc; color: #d4ddc9; font-family: var(--mono); font-size: 10px; }
 .card-open { position: absolute; top: 13px; right: 13px; z-index: 2; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #6a7e4c; background: #080a09e6; color: var(--lime); font-size: 20px; }
@@ -211,21 +208,11 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
 .motion-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--lime); }
 .footer button[aria-pressed=false] .motion-dot { background: #7e8775; }
 
-/* Language-specific rhythm. Chinese uses native sans families and spacing. */
-html[lang=ru] h1 { font-size: clamp(70px, 7.5vw, 105px); }
-html[lang=ru] .section-heading h2 { font-size: clamp(32px, 3.5vw, 50px); }
-html[lang=ru] .outro > a { font-size: clamp(32px, 5vw, 68px); letter-spacing: -2px; }
-html[lang=zh-Hans] { --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; }
-html[lang=zh-Hans] h1, html[lang=zh-Hans] h2, html[lang=zh-Hans] h3, html[lang=zh-Hans] .outro > a { letter-spacing: 0; }
-html[lang=zh-Hans] .hero-description, html[lang=zh-Hans] .card-body p, html[lang=zh-Hans] .about-copy > p { line-height: 1.9; }
-
 /* Tablet */
 @media (max-width: 1100px) {
   .wrap { padding-inline: 38px; }
   .header { gap: 20px; }
-  .header-tools { gap: 16px; }
   .main-nav { gap: 20px; }
-  .github-top { display: none; }
   .hero { min-height: 660px; padding-top: 52px; }
   .hero-art { right: 0; width: 56%; }
   .art-caption { left: 23%; right: 25px; flex-direction: column; align-items: flex-end; gap: 12px; }
@@ -249,7 +236,7 @@ html[lang=zh-Hans] .hero-description, html[lang=zh-Hans] .card-body p, html[lang
   .wrap { padding-inline: 26px; }
   .header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px; padding-top: 12px; padding-bottom: 6px; }
   .brand { gap: 8px; font-size: 17px; }
-  .header-tools { grid-column: 2; grid-row: 1; }
+  .github-top { grid-column: 2; grid-row: 1; }
   .main-nav { grid-column: 1 / -1; grid-row: 2; gap: 30px; font-size: 13px; }
   .hero { display: block; min-height: 0; padding-top: 32px; }
   .hero-copy > .eyebrow { margin-bottom: 20px; font-size: 10px; letter-spacing: 1px; }
@@ -294,8 +281,6 @@ html[lang=zh-Hans] .hero-description, html[lang=zh-Hans] .card-body p, html[lang
   .outro > a { letter-spacing: -2px; }
   .footer { flex-wrap: wrap; gap: 8px 20px; padding-block: 18px; }
   .footer > span { display: none; }
-  html[lang=ru] h1 { font-size: clamp(57px, 9.7vw, 77px); }
-  html[lang=ru] .section-heading h2 { font-size: 35px; }
 }
 
 /* Mobile */
@@ -305,7 +290,6 @@ html[lang=zh-Hans] .hero-description, html[lang=zh-Hans] .card-body p, html[lang
   .brand-mark { width: 29px; font-size: 27px; }
   .brand-mark span { font-size: 20px; }
   .header { column-gap: 8px; }
-  .languages { gap: 0; }
   .hero h1 { font-size: clamp(55px, 14.5vw, 76px); }
   .title-star { display: none; }
   .hero-copy > .eyebrow { max-width: 340px; font-size: 9px; }
@@ -376,10 +360,6 @@ html[lang=zh-Hans] .hero-description, html[lang=zh-Hans] .card-body p, html[lang
   .outro > a { font-size: 46px; letter-spacing: -2px; }
   .footer { column-gap: 14px; font-size: 9px; letter-spacing: .2px; }
   .footer #back-top { margin-left: auto; }
-  html[lang=ru] h1 { font-size: clamp(51px, 13.8vw, 70px); }
-  html[lang=ru] .section-heading h2 { font-size: 33px; letter-spacing: -1.3px; }
-  html[lang=ru] .outro > a { gap: 18px; font-size: 32px; letter-spacing: -1px; }
-  html[lang=zh-Hans] .hero h1 { font-size: 65px; line-height: 1.03; }
 }
 @media (max-width: 380px) {
   .wrap { padding-inline: 18px; }
@@ -398,7 +378,6 @@ html[lang=zh-Hans] .hero-description, html[lang=zh-Hans] .card-body p, html[lang
   .technical-code { font-size: 11px; }
   .music-copy { padding-inline: 21px; }
   .outro > a { font-size: 41px; }
-  html[lang=zh-Hans] .hero h1 { font-size: 53px; }
 }
 
 /* Both explicit and system preferences stop motion. */
