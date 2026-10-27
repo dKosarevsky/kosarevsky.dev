@@ -4,7 +4,7 @@ A personal studio for software, games, agent architecture and AI-assisted music 
 
 ## Content and behavior
 
-- Eight selected projects: A MOVE AGO, Agent Architecture, microGPT in Fortran, Teleport Research, Salvo, Aximo, albu-mcp and ajpegli. The first four have larger cards. The Fortran and physics projects currently have private source repositories, so their cards show short descriptions and a Private project label. The older four projects remain under Earlier experiments.
+- Nine selected projects: A MOVE AGO, Agent Architecture, microGPT in Fortran, Axiom Spacetime, AURIC OATH, Salvo, Aximo, albu-mcp and ajpegli. The first four have larger cards. Axiom Spacetime links to its public manuscript, derivation and interactive plots, with a Private solver label and no code link. Fortran remains a Private project without links. AURIC OATH links to the playable six-mission platformer; its source repository has not been verified. Axiom Spacetime and AURIC OATH use screenshots of the public research site and actual gameplay. The older four projects remain under Earlier experiments.
 - The site and 404 page are English only. Old language links and saved language preferences no longer change the page.
 - Motion choices are saved locally when storage is available. The interactive particle knot responds to the pointer, clicks and warp control; rendering pauses when offscreen or in a background tab and respects reduced motion.
 - Anima Dao includes Spotify and YouTube Music links. Spotify receives no request until the visitor clicks Load Spotify player. The embedded artist player does not autoplay; available playback depends on Spotify. Direct links remain visible if the embed is blocked.
@@ -34,7 +34,7 @@ Repository: <https://github.com/dKosarevsky/kosarevsky.dev>. Production: <https:
 
 Changes are prepared on feature branches and reviewed through pull requests. The GitHub Actions workflow checks and builds pull requests without deploying them. A push to `main` or a manual workflow run checks, builds and deploys `dist/` to GitHub Pages. Verify the Actions result and the live page after deployment.
 
-The studio refresh was deployed with HTTPS and both apex/www verified on 2026-10-22. Content changes remain on feature branches until merged. DNS does not need changing for content releases.
+The studio refresh was deployed with HTTPS and both apex/www verified on 2026-10-22. The English-only update was merged through [PR #2](https://github.com/dKosarevsky/kosarevsky.dev/pull/2) on 2026-10-23. Further content changes remain on feature branches until merged. DNS does not need changing for content releases.
 
 ## Domain configuration
 
