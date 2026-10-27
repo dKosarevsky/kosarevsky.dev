@@ -7,7 +7,7 @@ const storage = {
   get(key) { try { return localStorage.getItem(key); } catch { return null; } },
   set(key, value) { try { localStorage.setItem(key, value); } catch { /* Private mode works without persistence. */ } },
 };
-const actionLabels = { play: 'Play game', read: 'Read the book', launch: 'Open project', source: 'View source' };
+const actionLabels = { play: 'Play game', read: 'Read the book', research: 'Explore research', launch: 'Open project', source: 'View source' };
 let activeFilter = 'all';
 let warpEnabled = false;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -86,10 +86,10 @@ function renderProjects() {
       sourceLabel.textContent = 'GitHub';
       links.append(sourceLabel);
     }
-    if (project.private) {
+    if (project.privateSource) {
       const status = document.createElement('span');
       status.className = 'source';
-      status.textContent = 'Private project';
+      status.textContent = project.privateSourceLabel ?? (project.url ? 'Private source' : 'Private project');
       links.append(status);
     }
     body.append(meta, heading, description, links);
