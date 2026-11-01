@@ -15,10 +15,10 @@ const notFound = await read('404.html');
 assert.match(notFound, /<html lang="en">/, 'The 404 page must be in English');
 assert.doesNotMatch(html + notFound + app + css, /data-(?:lang|i18n)\b|kosarevsky-language|lang=(?:ru|zh)|(?:i18n|locale)\.js/, 'Language switching must be removed');
 assert.doesNotMatch(html + notFound + app, /[\p{Script=Cyrillic}\p{Script=Han}]/u, 'Public copy must be English only');
-assert.equal(projects.length, 9);
-assert.deepEqual(projects.map((p) => p.id), ['chess', 'book', 'fortran', 'teleport', 'auric', 'salvo', 'aximo', 'mcp', 'jpeg']);
-assert.match(html, /<sup>09<\/sup>/);
-assert.match(html, /id="project-count">09 PROJECTS</);
+assert.equal(projects.length, 10);
+assert.deepEqual(projects.map((p) => p.id), ['chess', 'book', 'fortran', 'teleport', 'orbit', 'auric', 'salvo', 'aximo', 'mcp', 'jpeg']);
+assert.match(html, /<sup>10<\/sup>/);
+assert.match(html, /id="project-count">10 PROJECTS</);
 assert.equal(new Set(projects.map((p) => p.id)).size, projects.length, 'Project IDs must be unique');
 for (const project of projects) {
   assert.ok(['tools', 'games', 'ai', 'research'].includes(project.category));
