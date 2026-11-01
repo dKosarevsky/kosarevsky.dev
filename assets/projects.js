@@ -36,6 +36,13 @@ export const projects = [
     description: 'Explore the mathematics of a wormhole mouth through a public manuscript, detailed derivation and interactive plots.',
   },
   {
+    id: 'orbit', name: 'Orbita', category: 'research', tags: ['ASTRONOMY', 'SOLAR SYSTEM', 'TIMELINE'],
+    preview: './assets/previews/orbita.svg',
+    action: 'launch',
+    url: 'https://orbit.kosarevsky.dev/',
+    description: 'An interactive Solar System atlas. Explore calculated planetary positions by date and revisit milestones in space exploration.',
+  },
+  {
     id: 'auric', name: 'AURIC OATH', category: 'games', tags: ['ACTION PLATFORMER', 'SIX MISSIONS', 'BROWSER GAME'],
     preview: './assets/previews/auric-oath.jpg',
     action: 'play',

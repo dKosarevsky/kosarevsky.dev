@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs>
+    <radialGradient id="space"><stop stop-color="#203537"/><stop offset="1" stop-color="#0b1419"/></radialGradient>
+    <radialGradient id="sun"><stop stop-color="#fff1b5"/><stop offset="1" stop-color="#e9a857"/></radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#space)"/>
+  <g fill="#b7cbd0" opacity=".45">
+    <circle cx="110" cy="180" r="2"/><circle cx="1050" cy="170" r="2"/>
+    <circle cx="230" cy="620" r="2"/><circle cx="1010" cy="620" r="2"/>
+    <circle cx="330" cy="100" r="2"/><circle cx="940" cy="720" r="2"/>
+  </g>
+  <g transform="translate(600 400) rotate(-18)">
+    <g fill="none" stroke="#7caaa4" stroke-width="2" opacity=".4">
+      <ellipse rx="75" ry="42"/><ellipse rx="125" ry="70"/>
+      <ellipse rx="180" ry="101"/><ellipse rx="235" ry="132"/>
+      <ellipse rx="300" ry="168"/><ellipse rx="365" ry="204"/>
+      <ellipse rx="430" ry="241"/><ellipse rx="500" ry="280"/>
+    </g>
+    <circle r="46" fill="#efba73" opacity=".08"/>
+    <circle r="30" fill="url(#sun)"/>
+    <circle cx="65" cy="21" r="5" fill="#b9aa91"/>
+    <circle cx="-108" cy="-35" r="8" fill="#d8c08b"/>
+    <circle cx="90" cy="-87" r="10" fill="#70b6c2"/>
+    <circle cx="-203" cy="66" r="7" fill="#ce8062"/>
+    <circle cx="260" cy="84" r="21" fill="#cdac84"/>
+    <g transform="translate(-183 -177)">
+      <circle r="17" fill="#dfcc9c"/>
+      <ellipse rx="31" ry="8" fill="none" stroke="#b7a77f" stroke-width="4"/>
+    </g>
+    <circle cx="215" cy="209" r="13" fill="#8ac2c2"/>
+    <circle cx="-433" cy="140" r="12" fill="#6d91bf"/>
+  </g>
+  <text x="70" y="88" fill="#d4e2d9" font-family="monospace" font-size="24" letter-spacing="6">ORBITA</text>
+  <text x="70" y="739" fill="#88aaa5" font-family="monospace" font-size="17" letter-spacing="3">SOLAR SYSTEM / THROUGH TIME</text>
+</svg>
