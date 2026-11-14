@@ -27,7 +27,7 @@ function harness() {
   const document = { ...target(), hidden: false };
   const window = target();
   const host = target();
-  const selectors = ['canvas', '[data-node-teleport]', '[data-node-reset]', '[data-node-status]', '[data-node-phase]', '[data-node-count]', '[data-node-progress]', '[data-node-entry]', '[data-node-exit]', '[data-node-retry]'];
+  const selectors = ['canvas', '[data-node-teleport]', '[data-node-reset]', '[data-node-status]', '[data-node-phase]', '[data-node-count]', '[data-node-progress]', '[data-node-entry]', '[data-node-exit]', '[data-node-retry]', '[data-node-world]'];
   const elements = Object.fromEntries(selectors.map(selector => [selector, target()]));
   host.querySelector = selector => elements[selector];
   function install(name, value) {
@@ -164,4 +164,18 @@ function sceneModule() {
     assert.equal(runtime.calls.destroy, 1);
   } finally { h.restore(); }
 }
-console.log('Multiverse loader checks passed: first-frame readiness, deferred import, shared motion race, failure fallback, input, teardown, and late import disposal.');
+{
+  const h = harness(), runtime = sceneModule();
+  try {
+    const controller = initMultiverse(h.host, { loadScene: async () => runtime.module });
+    h.intersect(true); h.step(); h.step(); await settle();
+    runtime.callbacks.onReady();
+    runtime.callbacks.onStatus({ active: false, phase: 'arrive', completedCount: 1, currentUniverse: 1, destinationUniverse: 2, universeName: 'Mirror', destinationName: 'Ember' });
+    assert.equal(h.elements['[data-node-world]'].textContent, 'U—02 MIRROR');
+    assert.equal(h.elements['[data-node-entry]'].textContent, '→ EMBER');
+    assert.equal(h.elements['[data-node-teleport]'].getAttribute('aria-label'), 'Teleport to Ember');
+    assert.match(h.elements['[data-node-status]'].textContent, /Mirror/);
+    controller.destroy();
+  } finally { h.restore(); }
+}
+console.log('Multiverse loader checks passed: readiness, deferred import, motion race, fallback, world labels, input, teardown, and late import disposal.');

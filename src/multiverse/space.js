@@ -1,21 +1,24 @@
 import * as THREE from 'three';
 
-export function createSpace() {
+export function createSpace({ includeStars = true } = {}) {
   const group = new THREE.Group();
   let seed = 7614;
   const random = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-  const positions = [], colors = [];
-  for (let i = 0; i < 1050; i++) {
-    positions.push((random() - .5) * 22, (random() - .5) * 15, -3 - random() * 11);
-    const light = .12 + random() * .65;
-    const warm = random() > .88;
-    colors.push(light * (warm ? 1 : .72), light * (warm ? .83 : .9), light * (warm ? .62 : 1));
+  let stars;
+  if (includeStars) {
+    const positions = [], colors = [];
+    for (let i = 0; i < 1050; i++) {
+      positions.push((random() - .5) * 22, (random() - .5) * 15, -3 - random() * 11);
+      const light = .12 + random() * .65;
+      const warm = random() > .88;
+      colors.push(light * (warm ? 1 : .72), light * (warm ? .83 : .9), light * (warm ? .62 : 1));
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    stars = new THREE.Points(geometry, new THREE.PointsMaterial({ size: .027, vertexColors: true, transparent: true, opacity: .8, depthWrite: false }));
+    group.add(stars);
   }
-  const starsGeometry = new THREE.BufferGeometry();
-  starsGeometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  starsGeometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-  const stars = new THREE.Points(starsGeometry, new THREE.PointsMaterial({ size: .027, vertexColors: true, transparent: true, opacity: .8, depthWrite: false }));
-  group.add(stars);
 
   const orbits = new THREE.Group();
   for (let layer = 0; layer < 3; layer++) {
@@ -38,14 +41,17 @@ export function createSpace() {
   gridGeometry.setAttribute('position', new THREE.Float32BufferAttribute(lattice, 3));
   const grid = new THREE.LineSegments(gridGeometry, new THREE.LineBasicMaterial({ color: 0x5f8667, transparent: true, opacity: .04 }));
   group.add(orbits, grid);
-  return { group, update(time) { stars.rotation.z = time * .001; orbits.rotation.y = Math.sin(time * .08) * .035; } };
+  return { group, update(time) { if (stars) stars.rotation.z = time * .001; orbits.rotation.y = Math.sin(time * .08) * .035; } };
 }
 
 export function createPortal({ radius = .62, color = 0xc8ff64 } = {}) {
   const material = new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    uniforms: { uTime: { value: 0 }, uPower: { value: .3 }, uTransfer: { value: 0 }, uColor: { value: new THREE.Color(color) } },
+    uniforms: {
+      uTime: { value: 0 }, uPower: { value: .3 }, uTransfer: { value: 0 }, uColor: { value: new THREE.Color(color) },
+      uWorld: { value: null }, uHasWorld: { value: 0 }, uOutputResolution: { value: new THREE.Vector2(1, 1) },
+    },
     vertexShader: `varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
     fragmentShader: `
       varying vec2 vUv;
@@ -53,6 +59,9 @@ export function createPortal({ radius = .62, color = 0xc8ff64 } = {}) {
       uniform float uPower;
       uniform float uTransfer;
       uniform vec3 uColor;
+      uniform sampler2D uWorld;
+      uniform float uHasWorld;
+      uniform vec2 uOutputResolution;
       float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float bell(float x){return exp(-x*x);}
       void main(){
@@ -91,7 +100,10 @@ export function createPortal({ radius = .62, color = 0xc8ff64 } = {}) {
         star*=outside*(1.-smoothstep(.8,.98,r));
         light+=vec3(.6,.8,1.)*star*.8;
         float aperture=1.-smoothstep(horizon-.015,horizon,r);
-        light=mix(light,vec3(.0008,.0015,.002),aperture);
+        vec2 worldUv=gl_FragCoord.xy/uOutputResolution;
+        vec3 world=texture2D(uWorld,worldUv).rgb;
+        vec3 interior=mix(vec3(.0008,.0015,.002),world,uHasWorld);
+        light=mix(light,interior,aperture);
         float alpha=max(aperture,clamp(photon+secondary+halo*2.+accretion+ripple+star*.5,0.,1.));
         alpha*=1.-smoothstep(.9,1.,r);
         gl_FragColor=vec4(light,alpha);
@@ -113,7 +125,16 @@ export function createPortal({ radius = .62, color = 0xc8ff64 } = {}) {
   };
   const group = new THREE.Group();
   group.add(mesh);
-  return { group, mesh, update(time, power, transfer = 0) { material.uniforms.uTime.value = time; material.uniforms.uPower.value = power; material.uniforms.uTransfer.value = transfer; } };
+  return {
+    group, mesh,
+    update(time, power, transfer = 0) { material.uniforms.uTime.value = time; material.uniforms.uPower.value = power; material.uniforms.uTransfer.value = transfer; },
+    setWorld(texture, resolution) {
+      material.uniforms.uWorld.value = texture;
+      material.uniforms.uHasWorld.value = texture ? 1 : 0;
+      material.uniforms.uOutputResolution.value = resolution;
+    },
+    setColor(color) { material.uniforms.uColor.value.set(color); },
+  };
 }
 
 export function disposeTree(group) {

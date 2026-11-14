@@ -6,6 +6,7 @@ test('transit starts idle and rejects activation during a flight', () => {
   const transit = createTransit();
   assert.deepEqual(transit.snapshot(), {
     active: false, progress: 0, phase: 'idle', completedCount: 0,
+    currentUniverse: 0, destinationUniverse: 1,
   });
   assert.equal(transit.start(), true);
   transit.advance(0.5);
@@ -29,6 +30,7 @@ test('a default flight visits every phase and finishes at 2.35 seconds', () => {
   transit.advance(0.25);
   assert.deepEqual(transit.snapshot(), {
     active: false, progress: 1, phase: 'arrive', completedCount: 1,
+    currentUniverse: 1, destinationUniverse: 2,
   });
 });
 
@@ -42,6 +44,7 @@ test('finishing a paused or hidden flight counts completion exactly once', () =>
     transit.advance(30);
     assert.deepEqual(transit.snapshot(), {
       active: false, progress: 1, phase: 'arrive', completedCount: 1,
+      currentUniverse: 1, destinationUniverse: 2,
     });
   }
 });
@@ -79,8 +82,84 @@ test('snapshots are copies, not mutable internal state', () => {
   const snapshot = transit.snapshot();
   snapshot.active = true;
   snapshot.completedCount = 99;
+  snapshot.currentUniverse = 99;
+  snapshot.destinationUniverse = 99;
   assert.equal(transit.start(), true);
   assert.equal(transit.snapshot().completedCount, 0);
+  assert.equal(transit.snapshot().currentUniverse, 0);
+  assert.equal(transit.snapshot().destinationUniverse, 1);
+  transit.finish();
+  assert.equal(transit.snapshot().currentUniverse, 1);
+  assert.equal(transit.snapshot().destinationUniverse, 2);
+});
+
+test('a flight locks its origin and destination through every active phase', () => {
+  const transit = createTransit();
+  assert.equal(transit.snapshot().currentUniverse, 0);
+  assert.equal(transit.snapshot().destinationUniverse, 1);
+  transit.start();
+  for (const delta of [0, 0.7, 0.5, 0.9]) {
+    const snapshot = transit.advance(delta);
+    assert.equal(snapshot.active, true);
+    assert.equal(snapshot.completedCount, 0);
+    assert.equal(snapshot.currentUniverse, 0);
+    assert.equal(snapshot.destinationUniverse, 1);
+  }
+});
+
+test('repeated activation cannot skip a universe or replace the destination', () => {
+  const transit = createTransit();
+  transit.start();
+  transit.advance(1.2);
+  for (const options of [{}, { instant: true }, {}]) {
+    assert.equal(transit.start(options), false);
+    assert.equal(transit.snapshot().currentUniverse, 0);
+    assert.equal(transit.snapshot().destinationUniverse, 1);
+  }
+  const arrived = transit.finish();
+  assert.equal(arrived.completedCount, 1);
+  assert.equal(arrived.currentUniverse, 1);
+  assert.equal(arrived.destinationUniverse, 2);
+});
+
+test('consecutive instant flights cycle through all three universes', () => {
+  const transit = createTransit();
+  for (const [currentUniverse, destinationUniverse, completedCount] of [
+    [1, 2, 1], [2, 0, 2], [0, 1, 3],
+  ]) {
+    assert.equal(transit.start({ instant: true }), true);
+    const arrived = transit.snapshot();
+    assert.equal(arrived.active, false);
+    assert.equal(arrived.completedCount, completedCount);
+    assert.equal(arrived.currentUniverse, currentUniverse);
+    assert.equal(arrived.destinationUniverse, destinationUniverse);
+    assert.deepEqual(transit.finish(), arrived);
+  }
+});
+
+test('a custom pair of universes alternates on completed flights', () => {
+  const transit = createTransit({ universeCount: 2 });
+  assert.equal(transit.snapshot().currentUniverse, 0);
+  assert.equal(transit.snapshot().destinationUniverse, 1);
+  transit.start({ instant: true });
+  assert.equal(transit.snapshot().currentUniverse, 1);
+  assert.equal(transit.snapshot().destinationUniverse, 0);
+  transit.start();
+  transit.advance(1.2);
+  assert.equal(transit.snapshot().currentUniverse, 1);
+  assert.equal(transit.snapshot().destinationUniverse, 0);
+  const arrived = transit.finish();
+  assert.equal(arrived.completedCount, 2);
+  assert.equal(arrived.currentUniverse, 0);
+  assert.equal(arrived.destinationUniverse, 1);
+});
+
+test('the universe count must be an integer of at least two', () => {
+  for (const universeCount of [0, 1, -1, 2.5, NaN, Infinity, '3', null, true]) {
+    assert.throws(() => createTransit({ universeCount }), {
+      name: 'RangeError', message: 'universeCount must be an integer of at least 2',
+    });
+  }
 });
 
 test('a short primary-pointer gesture is a tap', () => {

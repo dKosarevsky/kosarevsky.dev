@@ -11,7 +11,7 @@
     "dev": "npm run build && python3 -m http.server 4173 --bind 127.0.0.1 --directory dist",
     "prototype": "node scripts/prototype.mjs --serve",
     "prototype:build": "node scripts/prototype.mjs",
-    "prototype:check": "node --test prototypes/multiverse/state.test.mjs prototypes/multiverse/space.test.mjs prototypes/multiverse/scene.test.mjs"
+    "prototype:check": "node --test prototypes/multiverse/state.test.mjs prototypes/multiverse/space.test.mjs prototypes/multiverse/scene.test.mjs prototypes/multiverse/portal-view.test.mjs prototypes/multiverse/universes.test.mjs"
   },
   "engines": {
     "node": ">=22"

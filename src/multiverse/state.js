@@ -1,5 +1,8 @@
 /** A flight owns its completion; finish() is safe for both pause and visibility events. */
-export function createTransit({ duration = 2.35 } = {}) {
+export function createTransit({ duration = 2.35, universeCount = 3 } = {}) {
+  if (!Number.isInteger(universeCount) || universeCount < 2) {
+    throw new RangeError('universeCount must be an integer of at least 2');
+  }
   let active = false;
   let elapsed = 0;
   let completedCount = 0;
@@ -10,7 +13,11 @@ export function createTransit({ duration = 2.35 } = {}) {
       : progress < 0.23 ? 'align'
         : progress < 0.43 ? 'open'
           : progress < 0.79 ? 'transfer' : 'arrive';
-    return { active, progress, phase, completedCount };
+    return {
+      active, progress, phase, completedCount,
+      currentUniverse: completedCount % universeCount,
+      destinationUniverse: (completedCount + 1) % universeCount,
+    };
   }
 
   function finish() {

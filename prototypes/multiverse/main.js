@@ -52,15 +52,19 @@ try {
     },
     onStatus(state) {
       if (!ready) return;
-      const [title, copy] = state.active ? phaseCopy[state.phase] : state.completedCount
-        ? ['LINK STABLE', motion ? 'Jump complete. Send the probe through again.' : 'Jump complete. Motion is paused; jumps resolve instantly.']
-        : ['LINK STABLE', motion ? 'Your shortcut is ready. Give it a try.' : 'Motion is paused. Rotate freely; jumps resolve instantly.'];
+      const [title, copy] = state.active ? phaseCopy[state.phase] : ['LINK STABLE',
+        `You are in ${state.universeName}. ${motion ? `Inside the portal: ${state.destinationName}.` : 'Motion is paused; jumps resolve instantly.'}`];
       element('status-title').textContent = title;
       element('status').textContent = copy;
       element('jump-count').textContent = String(state.completedCount).padStart(3, '0');
       element('teleport-label').textContent = state.active ? 'In transit…' : 'Teleport';
       teleportButton.disabled = resetButton.disabled = state.active;
       teleportButton.setAttribute('aria-busy', String(state.active));
+      teleportButton.setAttribute('aria-label', `Teleport to ${state.destinationName}`);
+      element('universe-number').textContent = String(state.currentUniverse + 1).padStart(2, '0');
+      element('universe-name').textContent = state.universeName;
+      element('world-coordinate').textContent = `U—${String(state.currentUniverse + 1).padStart(2, '0')} / ${state.universeName.toUpperCase()}`;
+      element('entry-label').textContent = `→ ${state.destinationName.toUpperCase()}`;
     },
     onFrame(state) {
       element('transit-progress').style.transform = `scaleX(${state.active ? state.progress : 0})`;

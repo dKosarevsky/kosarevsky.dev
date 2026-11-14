@@ -21,7 +21,7 @@ await Promise.all([...entries, "src/multiverse/scene.js"].map((entry) => stat(pa
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 for (const entry of entries) {
-  await cp(path.join(root, entry), path.join(output, entry), { recursive: true });
+  await cp(path.join(root, entry), path.join(output, entry), { recursive: true, filter: source => path.basename(source) !== '.DS_Store' });
 }
 await build({
   entryPoints: [path.join(root, "src/multiverse/scene.js")],
@@ -37,12 +37,12 @@ await build({
 });
 // One content revision keeps HTML and the complete lazy module graph in sync.
 const hash = createHash("sha256");
-for (const name of ["app.js", "projects.js", "multiverse.js", "multiverse-scene.js", "style.css"]) {
+for (const name of ["app.js", "projects.js", "multiverse.js", "multiverse-scene.js", "style.css", "hero/multiverse-poster.webp"]) {
   hash.update(name + "\0").update(await readFile(path.join(output, "assets", name)));
 }
 const revision = hash.digest("hex").slice(0, 12);
 const versionedReferences = {
-  "index.html": ["./assets/app.js", "./assets/style.css"],
+  "index.html": ["./assets/app.js", "./assets/style.css", "./assets/hero/multiverse-poster.webp"],
   "assets/app.js": ["./projects.js", "./multiverse.js"],
   "assets/multiverse.js": ["./multiverse-scene.js"],
 };
