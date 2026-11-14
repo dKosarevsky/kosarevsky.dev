@@ -3,6 +3,8 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { createArtifact } from './artifact.js';
 import { createTransit, createGesture } from './state.js';
 import { createSpace, createPortal, disposeTree } from './space.js';
+import { createUniverseView } from './portal-view.js';
+import { UNIVERSES } from './universes.js';
 
 const clamp = THREE.MathUtils.clamp;
 const ease = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
@@ -17,7 +19,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(36, 1, .1, 60);
+  const camera = new THREE.PerspectiveCamera(36, 1, .1, 120);
   const environmentScene = new RoomEnvironment();
   const pmrem = new THREE.PMREMGenerator(renderer);
   let environment;
@@ -42,7 +44,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
 
   const artifact = createArtifact();
   artifact.group.rotation.set(BASE_X, BASE_Y, 0);
-  const space = createSpace();
+  const space = createSpace({ includeStars: false });
   scene.add(space.group, artifact.group);
   const entry = createPortal({ radius: .59 });
   entry.group.position.set(0, 0, 1.445);
@@ -89,7 +91,12 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   probeTrail.frustumCulled = false;
   scene.add(probeTrail);
 
-  const transit = createTransit();
+  let worlds;
+  try { worlds = createUniverseView(renderer); }
+  catch (error) { disposeTree(scene); environment.dispose(); renderer.dispose(); throw error; }
+  entry.setWorld(worlds.texture, worlds.outputResolution);
+
+  const transit = createTransit({ universeCount: UNIVERSES.length });
   const gesture = createGesture();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -120,7 +127,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     if (force || state.phase !== previousPhase || state.completedCount !== previousCount) {
       previousPhase = state.phase;
       previousCount = state.completedCount;
-      onStatus?.(state);
+      onStatus?.({ ...state, universeName: UNIVERSES[state.currentUniverse].name, destinationName: UNIVERSES[state.destinationUniverse].name });
     }
     return state;
   }
@@ -134,6 +141,24 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   }
   let shaderFailed = false;
   renderer.debug.onShaderError = () => { shaderFailed = true; };
+
+  function updateWorldCameras(travel = 0) {
+    scene.updateMatrixWorld(true);
+    worlds.update({ camera, entranceMatrix: entry.group.matrixWorld, time, travel });
+  }
+  function commitWorld() {
+    const index = transit.snapshot().currentUniverse;
+    if (index !== worlds.currentIndex) worlds.commit(index);
+  }
+  function finishFlight() {
+    if (!transit.snapshot().active) return;
+    // An interrupted/instant trip resolves at the same aligned aperture as a full trip.
+    yaw = BASE_Y; pitch = BASE_X;
+    artifact.group.quaternion.copy(baseRotation);
+    updateWorldCameras(1);
+    transit.finish();
+    commitWorld();
+  }
 
   function project(point) {
     projected.copy(point).project(camera);
@@ -177,8 +202,10 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     const entryTransfer = state.active ? Math.sin(Math.PI * clamp((p - .39) / .22, 0, 1)) : 0;
     const exitTransfer = state.active ? Math.sin(Math.PI * clamp((p - .63) / .24, 0, 1)) : 0;
     entry.update(time, .28 + opening * .75, entryTransfer);
+    entry.setColor(worlds.destinationPreset.accent);
     exit.update(time, .08 + opening * 1.1, exitTransfer);
     exitRim.material.emissiveIntensity = .3 + opening * 1.5;
+    bounce.color.set(worlds.currentPreset.accent);
     space.update(time);
     scene.updateMatrixWorld(true);
     entry.group.getWorldPosition(entryWorld);
@@ -218,7 +245,9 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     probeLight.intensity = .9 + (entryTransfer + exitTransfer) * 1.25;
     if (motion) { probeBody.rotation.y = time * .7; probeBand.rotation.z = time * .35; probe.position.y += Math.sin(time * 1.2) * .015 * (state.active ? 0 : 1); }
     try {
-      renderer.render(scene, camera);
+      updateWorldCameras(state.active ? ease((p - .58) / .36) : 0);
+      const mouth = project(entryWorld);
+      worlds.render({ artifactScene: scene, camera, reveal: state.active ? ease((p - .58) / .36) : 0, center: { x: mouth.x / width, y: mouth.y / height } });
       if (shaderFailed) {
         fail(new Error('The portal shader could not compile.'));
         return;
@@ -238,7 +267,9 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     const delta = lastTime ? Math.min(.06, (timestamp - lastTime) / 1000) : 0;
     lastTime = timestamp;
     time += delta;
+    const wasActive = transit.snapshot().active;
     transit.advance(delta);
+    if (wasActive && !transit.snapshot().active) commitWorld();
     render(delta);
     schedule();
   }
@@ -254,6 +285,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     camera.position.set(.25, .12, verticalSpan / (2 * Math.tan(THREE.MathUtils.degToRad(18))));
     camera.lookAt(.25, .05, 0);
     camera.updateProjectionMatrix();
+    worlds.resize();
     render();
   }
   function pick(event) {
@@ -265,11 +297,11 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   function teleport() {
     if (!canRender() || transit.snapshot().active) return false;
     startRotation.copy(artifact.group.quaternion);
-    const started = transit.start({ instant: !motion });
+    const started = transit.start();
     if (!started) return false;
     velocityX = velocityY = 0;
     hover = -1;
-    if (!motion) { yaw = BASE_Y; pitch = BASE_X; }
+    if (!motion) finishFlight();
     notify(); render(); schedule();
     return true;
   }
@@ -329,7 +361,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   });
   listen(document, 'visibilitychange', () => {
     clearGesture(); stop();
-    if (document.hidden) { transit.finish(); notify(); }
+    if (document.hidden) { finishFlight(); notify(); }
     else { render(); schedule(); }
   });
   listen(canvas, 'webglcontextlost', event => { event.preventDefault(); fail(new Error('The graphics context was interrupted.')); });
@@ -337,7 +369,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   resizeObserver.observe(canvas);
   const intersectionObserver = new IntersectionObserver(entries => {
     onscreen = entries[0].isIntersecting;
-    if (!onscreen) { clearGesture(); stop(); transit.finish(); notify(); }
+    if (!onscreen) { clearGesture(); stop(); finishFlight(); notify(); }
     else { render(); schedule(); }
   });
   intersectionObserver.observe(canvas);
@@ -348,6 +380,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     resizeObserver.disconnect(); intersectionObserver.disconnect();
     listeners.forEach(remove => remove());
     disposeTree(scene);
+    worlds.dispose();
     environment.dispose();
     renderer.dispose();
   }
@@ -358,7 +391,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     setMotion(enabled) {
       motion = Boolean(enabled);
       clearGesture(); stop();
-      if (!motion) transit.finish();
+      if (!motion) finishFlight();
       notify(true);
       render(); schedule();
     },

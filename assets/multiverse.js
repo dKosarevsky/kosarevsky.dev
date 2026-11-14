@@ -15,6 +15,7 @@ export function initMultiverse(host, { motion = true, loadScene = loadRuntime } 
   const entryLabel = find('[data-node-entry]');
   const exitLabel = find('[data-node-exit]');
   const actionLabel = find('[data-node-action]');
+  const worldLabel = find('[data-node-world]');
   let scene, runtime, observer, frame = 0;
   let visible = false, loading = false, ready = false, failed = false, destroyed = false;
   let state = { active: false, phase: 'idle', completedCount: 0 };
@@ -32,12 +33,23 @@ export function initMultiverse(host, { motion = true, loadScene = loadRuntime } 
     if (actionLabel) actionLabel.textContent = state.active ? 'In transit…' : 'Teleport';
     phase.textContent = state.active ? phases[state.phase] : 'LINK STABLE';
     counter.textContent = String(state.completedCount).padStart(3, '0');
+    if (state.universeName && worldLabel) worldLabel.textContent = `U—${String(state.currentUniverse + 1).padStart(2, '0')} ${state.universeName.toUpperCase()}`;
+    if (state.destinationName) {
+      entryLabel.textContent = `→ ${state.destinationName.toUpperCase()}`;
+      teleportButton.setAttribute('aria-label', `Teleport to ${state.destinationName}`);
+    }
   }
   function describeStillState() {
     if (!ready || state.active) return;
-    status.textContent = state.completedCount
-      ? `Jump ${String(state.completedCount).padStart(2, '0')} complete. ${motion ? 'Follow the probe through again.' : 'Motion is paused; jumps resolve instantly.'}`
-      : motion ? 'Drag to rotate · tap the core' : 'Motion paused · rotate freely · jumps resolve instantly';
+    if (state.universeName && state.destinationName) {
+      status.textContent = state.completedCount
+        ? `Arrived in ${state.universeName}. ${motion ? `Next: ${state.destinationName}.` : 'Motion paused; jumps resolve instantly.'}`
+        : motion ? `Inside the portal: ${state.destinationName}. Drag to explore.` : `Portal to ${state.destinationName}. Motion paused; jumps resolve instantly.`;
+    } else {
+      status.textContent = state.completedCount
+        ? `Jump ${String(state.completedCount).padStart(2, '0')} complete. ${motion ? 'Follow the probe through again.' : 'Motion is paused; jumps resolve instantly.'}`
+        : motion ? 'Drag to rotate · tap the core' : 'Motion paused · rotate freely · jumps resolve instantly';
+    }
   }
   function fallback() {
     if (destroyed || failed) return;
@@ -49,6 +61,7 @@ export function initMultiverse(host, { motion = true, loadScene = loadRuntime } 
     canvas.setAttribute('aria-hidden', 'true');
     teleportButton.disabled = resetButton.disabled = true;
     phase.textContent = 'STILL VIEW';
+    if (worldLabel) worldLabel.textContent = 'STILL PREVIEW';
     status.textContent = '3D is unavailable. You can still explore the research.';
     retryButton.hidden = false;
     progress.style.transform = 'scaleX(0)';
@@ -76,9 +89,10 @@ export function initMultiverse(host, { motion = true, loadScene = loadRuntime } 
         },
         onStatus(next) {
           if (destroyed || failed) return;
+          const worldChanged = state.universeName !== next.universeName;
           state = next;
           updateControls();
-          if (!next.active && next.completedCount !== announcedCount) {
+          if (!next.active && (next.completedCount !== announcedCount || worldChanged)) {
             announcedCount = next.completedCount;
             describeStillState();
           }

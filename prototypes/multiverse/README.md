@@ -1,6 +1,6 @@
-# Multiverse Node — prototype 0.1
+# Multiverse Node — prototype 0.2
 
-A standalone study for the kosarevsky.dev hero: one universe, eight machined shell fragments, and a probe that crosses two linked portal mouths. It shares the scene implementation in `src/multiverse/` with the homepage; the prototype itself is excluded from the public build.
+A standalone study for the kosarevsky.dev hero: three volumetric universes, eight machined shell fragments, and a probe that crosses two linked portal mouths. The destination is visible through the aperture with depth parallax and becomes the surrounding environment on arrival. It shares the scene implementation in `src/multiverse/` with the homepage; the prototype itself is excluded from the public build.
 
 From the repository root, using Node 22 or later:
 

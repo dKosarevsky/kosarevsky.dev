@@ -11,6 +11,7 @@ const privateDirectories = new Set(['src', 'prototypes', 'node_modules', 'docs',
 const scenePath = path.join(root, 'assets/multiverse-scene.js');
 const cacheEdges = new Set([
   'index.html:assets/app.js', 'index.html:assets/style.css',
+  'index.html:assets/hero/multiverse-poster.webp',
   'assets/app.js:assets/projects.js', 'assets/app.js:assets/multiverse.js',
   'assets/multiverse.js:assets/multiverse-scene.js',
 ]);
