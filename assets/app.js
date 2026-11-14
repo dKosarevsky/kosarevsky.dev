@@ -1,5 +1,5 @@
 import { projects, filterProjects } from './projects.js';
-import { initOrb } from './orb.js';
+import { initMultiverse } from './multiverse.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
@@ -9,10 +9,9 @@ const storage = {
 };
 const actionLabels = { play: 'Play game', read: 'Read the book', research: 'Explore research', launch: 'Open project', source: 'View source' };
 let activeFilter = 'all';
-let warpEnabled = false;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 let motionEnabled = storage.get('kosarevsky-motion') !== 'off' && !reduced.matches;
-let orb;
+let multiverse;
 
 const art = {
   aximo: '<div class="technical-art"><span class="technical-label">VOICE → TEXT</span><div class="signal-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="technical-code">Rust / HTTP / WebSocket</span></div>',
@@ -106,7 +105,11 @@ function renderMotion() {
   document.documentElement.classList.toggle('motion-off', !motionEnabled);
   $('#motion-toggle').setAttribute('aria-pressed', String(motionEnabled));
   $('#motion-label').textContent = motionEnabled ? 'MOTION ON' : 'MOTION OFF';
-  orb?.setMotion(motionEnabled);
+  $('#node-motion').setAttribute('aria-pressed', String(motionEnabled));
+  $('#node-motion').setAttribute('aria-label', motionEnabled ? 'Pause motion' : 'Resume motion');
+  $('#node-motion-label').textContent = motionEnabled ? 'Pause' : 'Resume';
+  $('#node-motion-icon').textContent = motionEnabled ? 'Ⅱ' : '▷';
+  multiverse?.setMotion(motionEnabled);
 }
 
 $$('[data-filter]').forEach((button) => {
@@ -116,17 +119,13 @@ $$('[data-filter]').forEach((button) => {
     renderProjects();
   });
 });
-$('#warp').addEventListener('click', () => {
-  warpEnabled = !warpEnabled;
-  $('#warp').setAttribute('aria-pressed', String(warpEnabled));
-  $('#warp-label').textContent = warpEnabled ? 'RETURN TO ORBIT' : 'WARP MODE';
-  orb?.setMode(warpEnabled ? 'warp' : 'orbit');
-});
-$('#motion-toggle').addEventListener('click', () => {
+function toggleMotion() {
   motionEnabled = !motionEnabled;
   storage.set('kosarevsky-motion', motionEnabled ? 'on' : 'off');
   renderMotion();
-});
+}
+$('#motion-toggle').addEventListener('click', toggleMotion);
+$('#node-motion').addEventListener('click', toggleMotion);
 reduced.addEventListener('change', () => {
   motionEnabled = !reduced.matches && storage.get('kosarevsky-motion') !== 'off';
   renderMotion();
@@ -164,12 +163,4 @@ addEventListener('scroll', () => {
 renderProjects();
 renderMotion();
 updateProgress();
-try {
-  const canvas = $('#orb');
-  orb = initOrb(canvas);
-  if (canvas.getContext('2d')) document.body.classList.add('canvas-ready');
-  orb.setMotion(motionEnabled);
-} catch (error) {
-  // The static orbital illustration remains visible when canvas is unavailable.
-  console.warn('Interactive artwork is unavailable; showing the static illustration.', error);
-}
+multiverse = initMultiverse($('#multiverse'), { motion: motionEnabled });
