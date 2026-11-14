@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Multiverse Node. An interactive experiment in spacetime.">
+  <title>Multiverse Node — Kosarevsky Lab</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='14' fill='%23090d0b' stroke='%23c8ff64' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <a class="skip" href="#controls">Skip to controls</a>
+  <header class="header">
+    <a class="brand" href="https://kosarevsky.dev/" aria-label="Kosarevsky portfolio"><span class="brand-symbol" aria-hidden="true">k<span>_</span></span>KOSAREVSKY <span class="brand-lab">/ LAB</span></a>
+    <span class="edition mono">INTERACTIVE STUDY — 001</span>
+    <a class="back" href="https://kosarevsky.dev/">Back to studio <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="experiment" aria-labelledby="title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="dot"></span> A SMALL EXPERIMENT IN SPACETIME</p>
+        <h1 id="title">Multiverse<br><span>Node.</span></h1>
+        <p class="intro">One universe. Two ways out.<br>Take a shortcut through spacetime.</p>
+        <a class="research-link" href="https://blackhole.kosarevsky.dev/" target="_blank" rel="noopener">Explore spacetime research <span aria-hidden="true">↗</span></a>
+        <div class="universe-card"><span class="mono">YOU ARE HERE</span><p><b>01</b> Lattice</p><span class="universe-detail">A quiet corner of the possible.</span></div>
+      </div>
+
+      <div class="viewport" id="viewport" aria-busy="true">
+        <div class="space-grid" aria-hidden="true"></div>
+        <svg id="poster" viewBox="0 0 900 740" role="img" aria-label="A segmented dark artifact surrounding a luminous portal">
+          <defs>
+            <radialGradient id="shell"><stop stop-color="#52605b"/><stop offset=".38" stop-color="#262f2d"/><stop offset=".75" stop-color="#111817"/><stop offset="1" stop-color="#080c0b"/></radialGradient>
+            <radialGradient id="light"><stop stop-color="#c8ff64" stop-opacity=".15"/><stop offset="1" stop-color="#c8ff64" stop-opacity="0"/></radialGradient>
+            <linearGradient id="edge"><stop stop-color="#c8ff64" stop-opacity=".5"/><stop offset=".5" stop-color="#75918a" stop-opacity=".18"/><stop offset="1" stop-color="#c8ff64" stop-opacity=".15"/></linearGradient>
+          </defs>
+          <circle cx="440" cy="360" r="310" fill="url(#light)"/>
+          <g transform="translate(440 360) rotate(-12)">
+            <ellipse rx="290" ry="110" transform="rotate(-25)" fill="none" stroke="#7eaaa0" stroke-opacity=".15"/>
+            <circle r="194" fill="url(#shell)" stroke="url(#edge)" stroke-width="2"/>
+            <g stroke="#050a08" stroke-width="11"><path d="M0-194V-76M137-137L54-54M194 0H76M137 137L54 54M0 194V76M-137 137L-54 54M-194 0H-76M-137-137L-54-54"/></g>
+            <circle r="77" fill="#020504" stroke="#546c4a" stroke-width="9"/>
+            <circle r="62" fill="#010302" stroke="#c8ff64" stroke-width="2"/>
+            <ellipse cx="252" cy="-70" rx="36" ry="50" fill="#020504" stroke="#9ac8d5" stroke-opacity=".6"/>
+          </g>
+        </svg>
+        <canvas id="scene" aria-label="Rotatable Multiverse Node. Drag to rotate. Use the Teleport button to send the probe." aria-hidden="true" role="img"></canvas>
+        <span class="portal-label mono" id="entry-label" aria-hidden="true"><i></i>01 / ENTRY</span>
+        <span class="portal-label exit mono" id="exit-label" aria-hidden="true"><i></i>02 / EXIT</span>
+        <div class="viewport-top mono"><span>U—01 / LATTICE</span><span class="view-mode">DRAG TO ROTATE</span></div>
+        <div class="viewport-bottom mono"><span id="gesture-hint">DRAG TO ROTATE · TAP THE CORE</span><span>LOCAL SPACETIME</span></div>
+      </div>
+
+      <div class="controls" id="controls" aria-label="Artifact controls">
+        <div class="link-status"><span class="dot" id="status-dot"></span><div><span class="mono status-title" id="status-title">PREPARING THE NODE</span><p id="status" role="status" aria-live="polite">Loading your corner of the universe…</p></div></div>
+        <div class="actions">
+          <button class="icon-button" id="reset" type="button" aria-label="Reset artifact rotation" title="Reset view" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 9a8 8 0 1 1 0 7M4 3v6h6"/></svg></button>
+          <button class="motion-button" id="motion" type="button" aria-pressed="false" disabled><span id="motion-icon" aria-hidden="true">Ⅱ</span><span id="motion-label">Pause motion</span></button>
+          <button class="teleport" id="teleport" type="button" disabled><span id="teleport-label">Teleport</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 12h17M13 5l7 7-7 7"/></svg></button>
+          <button class="reload" id="reload" type="button" hidden>Reload preview ↻</button>
+        </div>
+        <div class="jump-counter mono"><span>SUCCESSFUL JUMPS</span><b id="jump-count">000</b></div>
+        <div class="transit-progress" aria-hidden="true"><span id="transit-progress"></span></div>
+      </div>
+    </section>
+
+    <footer class="notes">
+      <p><span class="mono">01 — ROTATE</span>Grab a fragment. Find a new angle.</p>
+      <p><span class="mono">02 — TELEPORT</span>Follow the same probe through both portals.</p>
+      <p><span class="mono">03 — STAY CURIOUS</span>One universe for now. More to come.</p>
+      <span class="prototype-tag mono">PROTOTYPE / 0.1</span>
+    </footer>
+    <noscript><p class="no-script">Enable JavaScript to rotate the artifact and try teleportation. The illustration above is a still preview.</p></noscript>
+  </main>
+  <script type="module">
+    import('./dist/main.js').catch(() => {
+      document.querySelector('#viewport').setAttribute('aria-busy', 'false');
+      document.querySelector('#status-title').textContent = 'STILL PREVIEW';
+      document.querySelector('#status').textContent = 'The interactive scene could not load. You can reload to try again.';
+      document.querySelector('#reload').hidden = false;
+      document.querySelector('#reload').onclick = () => location.reload();
+    });
+  </script>
+</body>
+</html>

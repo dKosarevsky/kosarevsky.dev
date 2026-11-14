@@ -87,4 +87,9 @@ const bytes = (await stat(path.join(root, 'index.html'))).size + await directory
 assert.ok(bytes < 1_000_000, `Static payload unexpectedly large: ${bytes}`);
 console.log(`PASS: English-only pages, ${projects.length} curated projects, working filter data, local assets/anchors/imports, JS syntax, motion/accessibility hooks.`);
 console.log(`HTML + all local assets: ${(bytes / 1024).toFixed(1)} KiB. Project previews are lazy; Spotify requires a click.`);
-await import('./check-orb.mjs');
+assert.match(html, /id="multiverse"/);
+assert.match(html, /data-node-teleport/);
+assert.match(html, /data-node-reset/);
+assert.match(html, /data-node-status[^>]*role="status"/);
+assert.doesNotMatch(app + html, /initOrb|id="orb"|id="warp"|getContext\(['"]2d/);
+await import('./check-multiverse.mjs');

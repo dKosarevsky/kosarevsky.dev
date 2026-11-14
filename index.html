@@ -13,6 +13,7 @@
   <link rel="canonical" href="https://kosarevsky.dev/">
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./assets/style.css">
+  <link rel="preload" href="./assets/hero/multiverse-poster.webp" as="image" type="image/webp">
   <title>Kosarevsky — Code. Play. Listen.</title>
 </head>
 <body id="top">
@@ -34,12 +35,27 @@
         <p class="hero-description">I make software, games and music.<br>Pick a project, play a game, or listen for a while.</p>
         <div class="hero-actions"><a href="#projects" class="button primary"><span>Explore the projects</span><span aria-hidden="true">↘</span></a><a class="text-link" href="#music"><span>Listen to Anima Dao</span><span aria-hidden="true">↗</span></a></div>
       </div>
-      <div class="hero-art">
-        <span class="art-coordinate mono" aria-hidden="true">A SMALL EXPERIMENT IN MOTION</span>
-        <div class="orbit-fallback" aria-hidden="true"><i></i><i></i><i></i></div>
-        <canvas id="orb" aria-hidden="true"></canvas>
-        <span class="art-cross cross-one" aria-hidden="true">+</span><span class="art-cross cross-two" aria-hidden="true">+</span>
-        <div class="art-caption"><span class="micro">MOVE YOUR CURSOR · CLICK TO PULSE</span><button id="warp" class="warp mono" type="button" aria-pressed="false"><span class="warp-icon" aria-hidden="true">⌁</span><span id="warp-label">WARP MODE</span></button></div>
+      <div class="hero-art" id="multiverse" aria-label="Multiverse Node" aria-busy="true">
+        <span class="art-coordinate mono" aria-hidden="true">MULTIVERSE NODE / U—01 LATTICE</span>
+        <div class="node-stage">
+          <img class="node-poster" src="./assets/hero/multiverse-poster.webp" width="907" height="502" alt="" aria-hidden="true" fetchpriority="high">
+          <canvas id="node-scene" role="img" aria-label="Multiverse Node. Drag or use arrow keys to rotate. Press Teleport to send the probe through the portals." aria-hidden="true"></canvas>
+          <span class="node-label node-entry mono" data-node-entry aria-hidden="true">01 / ENTRY</span>
+          <span class="node-label node-exit mono" data-node-exit aria-hidden="true">02 / EXIT</span>
+        </div>
+        <div class="node-console">
+          <div class="node-readout mono"><span><i class="status-dot" aria-hidden="true"></i><span data-node-phase>LINK STANDBY</span></span><span class="node-jumps">JUMP <b data-node-count>000</b></span><a href="https://blackhole.kosarevsky.dev/" target="_blank" rel="noopener noreferrer">Explore spacetime ↗</a></div>
+          <div class="node-control-row">
+            <p class="micro" data-node-status role="status" aria-live="polite">One universe. Two ways out.</p>
+            <div class="node-actions">
+              <button class="node-reset" type="button" data-node-reset aria-label="Reset artifact rotation" title="Reset view" disabled>↺</button>
+              <button class="node-motion" id="node-motion" type="button" aria-label="Pause motion" aria-pressed="true"><span id="node-motion-icon" aria-hidden="true">Ⅱ</span><span id="node-motion-label">Pause</span></button>
+              <button class="node-teleport" type="button" data-node-teleport disabled><span data-node-action>Teleport</span><span aria-hidden="true">→</span></button>
+              <button class="node-retry" type="button" data-node-retry hidden>Reload artwork ↻</button>
+            </div>
+          </div>
+          <div class="node-progress" aria-hidden="true"><span data-node-progress></span></div>
+        </div>
       </div>
       <div class="hero-bottom mono"><span>MADE TO BE USED, PLAYED AND HEARD.</span><a href="#projects"><span>SCROLL TO EXPLORE</span> <span aria-hidden="true">↓</span></a></div>
     </section>

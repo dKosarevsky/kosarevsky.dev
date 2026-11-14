@@ -5,11 +5,19 @@
   "type": "module",
   "description": "Personal projects and games at kosarevsky.dev",
   "scripts": {
-    "check": "node --experimental-vm-modules scripts/check.mjs",
+    "check": "node --experimental-vm-modules scripts/check.mjs && npm run prototype:check",
+    "check:dist": "node scripts/check-dist.mjs",
     "build": "node scripts/build.mjs",
-    "dev": "python3 -m http.server 4173"
+    "dev": "npm run build && python3 -m http.server 4173 --bind 127.0.0.1 --directory dist",
+    "prototype": "node scripts/prototype.mjs --serve",
+    "prototype:build": "node scripts/prototype.mjs",
+    "prototype:check": "node --test prototypes/multiverse/state.test.mjs prototypes/multiverse/space.test.mjs prototypes/multiverse/scene.test.mjs"
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "three": "0.187.0"
   }
 }

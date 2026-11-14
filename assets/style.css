@@ -46,8 +46,8 @@ img { display: block; max-width: 100%; }
 .github-top { display: inline-flex; align-items: center; gap: 14px; min-height: 44px; font-family: var(--mono); font-size: 12px; }
 .github-top span { color: var(--lime); }
 
-/* Hero: the orb keeps its existing interaction surface. */
-.hero { position: relative; isolation: isolate; display: grid; grid-template-columns: 1fr 1fr; min-height: 690px; padding-top: 60px; }
+/* Hero and the interactive Multiverse Node. */
+.hero { position: relative; isolation: isolate; display: grid; grid-template-columns: 1fr 1fr; min-height: 760px; padding-top: 60px; }
 .hero-grid { position: absolute; inset: 0; z-index: -2; opacity: .2; background-image: linear-gradient(#30382a 1px, transparent 1px), linear-gradient(90deg, #30382a 1px, transparent 1px); background-size: 72px 72px; mask-image: linear-gradient(90deg, transparent 18%, #000 75%, transparent); }
 .hero-copy { position: relative; z-index: 2; pointer-events: none; }
 .hero-copy a { pointer-events: auto; }
@@ -63,25 +63,8 @@ h1 > span:not(.title-star) { display: block; }
 .primary:hover { background: #dcff9e; transform: translateY(-2px); }
 .button > [aria-hidden="true"] { font-size: 19px; line-height: 1; }
 .text-link { display: inline-flex; align-items: center; gap: 16px; min-height: 44px; font-size: 13px; line-height: 1.5; transition: color .2s; }
-.hero-art { position: absolute; top: 18px; right: 12px; bottom: 83px; z-index: 1; width: 57%; min-height: 420px; overflow: hidden; }
-.hero-art canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: pan-y; }
-.art-coordinate { position: absolute; top: 32px; right: 45px; color: #849177; font-size: 10px; letter-spacing: .9px; }
-.art-caption { position: absolute; bottom: 12px; left: 22%; right: 42px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.micro { color: #a1ad93; font-size: 9px; line-height: 1.6; letter-spacing: .75px; }
-.warp { display: inline-flex; align-items: center; justify-content: center; gap: 9px; flex-shrink: 0; min-height: 44px; padding: 11px 14px; border: 1px solid #53633e; background: #080a09c9; font-size: 10px; white-space: nowrap; transition: background .2s; }
-.warp:hover { border-color: var(--lime); }
-.warp[aria-pressed=true] { background: var(--lime); color: #17200c; }
-.warp-icon { font-size: 22px; line-height: 1; }
-.art-cross { position: absolute; color: #7b8b6b; font-family: var(--mono); font-size: 18px; }
-.cross-one { top: 100px; right: 70px; }
-.cross-two { bottom: 115px; left: 90px; }
 .hero-bottom { z-index: 3; grid-column: 1 / -1; align-self: end; display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 32px; padding-block: 22px; color: #a6b09b; font-size: 10px; line-height: 1.6; letter-spacing: .8px; }
 .hero-bottom a { display: flex; align-items: center; gap: 22px; min-height: 44px; }
-.orbit-fallback { position: absolute; inset: 17%; border: 1px solid #84a642; border-radius: 50%; transform: rotate(-30deg); opacity: .6; }
-.orbit-fallback i { position: absolute; inset: 0; border: 1px solid #84a642; border-radius: 50%; transform: rotateY(65deg); }
-.orbit-fallback i:nth-child(2) { transform: rotateX(70deg); }
-.orbit-fallback i:nth-child(3) { inset: 10%; }
-.canvas-ready .orbit-fallback { display: none; }
 .ticker { overflow: hidden; padding-block: 18px; border-block: 1px solid var(--lime); background: var(--lime); color: #202a11; }
 .ticker > div { display: flex; align-items: center; gap: 44px; width: max-content; font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px; animation: marquee 35s linear infinite; }
 .ticker span { font-size: 21px; line-height: 18px; }
@@ -214,9 +197,6 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
   .header { gap: 20px; }
   .main-nav { gap: 20px; }
   .hero { min-height: 660px; padding-top: 52px; }
-  .hero-art { right: 0; width: 56%; }
-  .art-caption { left: 23%; right: 25px; flex-direction: column; align-items: flex-end; gap: 12px; }
-  .art-coordinate { right: 25px; font-size: 9px; }
   .title-star { right: -68px; font-size: 50px; }
   .hero-actions { gap: 12px 20px; }
   .hero-actions .text-link { font-size: 12px; }
@@ -231,7 +211,7 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
   .about-layout { gap: 45px; }
 }
 
-/* Small screens: visible second navigation row, compact separate orb. */
+/* Small screens: visible navigation and a separate interactive artwork. */
 @media (max-width: 800px) {
   .wrap { padding-inline: 26px; }
   .header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px; padding-top: 12px; padding-bottom: 6px; }
@@ -244,14 +224,6 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
   .title-star { right: -70px; font-size: 51px; }
   .hero-description { margin-top: 22px; font-size: 15px; line-height: 1.65; }
   .hero-actions { margin-top: 22px; gap: 10px 22px; }
-  .hero-art { position: relative; top: auto; right: auto; bottom: auto; width: 100%; height: 210px; min-height: 0; margin-top: 12px; }
-  .hero-art canvas { top: -28px; height: 220px; }
-  .art-coordinate { top: 7px; right: 0; font-size: 8px; }
-  .art-caption { bottom: 0; left: 0; right: 0; flex-direction: row; align-items: center; gap: 16px; }
-  .art-caption .micro { max-width: 220px; font-size: 9px; letter-spacing: .4px; }
-  .cross-one { top: 50px; right: 30px; }
-  .cross-two { bottom: 60px; left: 30px; }
-  .orbit-fallback { inset: 0 30% 40px; }
   .hero-bottom { margin-top: 8px; padding-block: 8px 12px; font-size: 9px; letter-spacing: .3px; }
   .hero-bottom a { gap: 12px; }
   .ticker { padding-block: 15px; }
@@ -297,10 +269,6 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
   .hero-actions { gap: 8px 18px; }
   .hero-actions .button { gap: 18px; min-height: 48px; padding: 13px 17px; }
   .hero-actions .text-link { gap: 12px; font-size: 12px; }
-  .hero-art { height: 190px; margin-top: 8px; }
-  .hero-art canvas { top: -20px; height: 188px; }
-  .art-coordinate { font-size: 7px; letter-spacing: .5px; }
-  .art-caption .micro { max-width: 165px; font-size: 8px; }
   .warp { padding-inline: 11px; font-size: 9px; }
   .hero-bottom { gap: 18px; font-size: 8px; }
   .hero-bottom > span { max-width: 160px; }
@@ -372,12 +340,82 @@ h2 { font-size: clamp(36px, 4vw, 56px); font-weight: 500; line-height: 1.1; lett
   .hero-actions .text-link { font-size: 11px; }
   .hero-bottom { font-size: 7px; }
   .hero-bottom > span { max-width: 133px; }
-  .art-caption .micro { max-width: 130px; font-size: 7px; }
   .filters button { padding-inline: 8px; }
   .card-body { padding: 21px; }
   .technical-code { font-size: 11px; }
   .music-copy { padding-inline: 21px; }
   .outro > a { font-size: 41px; }
+}
+
+/* The scene has its own space; its controls remain ordinary, accessible HTML. */
+.hero-art { position: absolute; top: 12px; right: 0; bottom: 100px; z-index: 1; width: 63%; min-height: 570px; }
+.art-coordinate { position: absolute; top: 21px; right: 56px; color: #8ca18f; font-size: 9px; letter-spacing: 1.1px; }
+.node-stage { position: absolute; inset: 43px 0 103px; overflow: hidden; }
+.node-poster, .hero-art canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.node-poster { object-fit: contain; pointer-events: none; opacity: 1; transition: opacity .25s; }
+.hero-art canvas { opacity: 0; touch-action: pan-y pinch-zoom; cursor: grab; transition: opacity .25s; }
+.hero-art canvas:active { cursor: grabbing; }
+.hero-art canvas:focus-visible { outline-offset: -6px; }
+.hero-art[data-scene=ready] canvas { opacity: 1; }
+.hero-art[data-scene=ready] .node-poster { opacity: 0; }
+.node-label { position: absolute; top: 0; left: 0; color: #8caa95; font-size: 7px; letter-spacing: 1px; pointer-events: none; opacity: 0; white-space: nowrap; }
+.node-label::before { content: ""; display: inline-block; width: 18px; height: 1px; margin-right: 6px; background: #6e89675c; vertical-align: middle; }
+.node-exit { color: #83a9bd; }
+.hero-art[data-scene=ready] .node-label { opacity: 1; }
+.node-console { position: absolute; bottom: 0; left: 15%; right: 40px; padding-block: 13px 14px; border-block: 1px solid var(--line); }
+.node-readout { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; color: #96ad91; font-size: 8px; line-height: 1.5; letter-spacing: .6px; }
+.node-readout > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
+.node-readout .status-dot { display: inline-block; width: 4px; height: 4px; }
+.node-jumps { color: #6e8574; font-size: 7px; }
+.node-jumps b { font-weight: 400; color: #b8cbb0; }
+.node-readout a { margin-left: auto; padding-block: 8px; color: #a9bfa6; font-size: 8px; letter-spacing: .2px; }
+.node-readout a:hover { color: var(--lime); }
+.node-control-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.micro { color: #92a28d; font-size: 9px; line-height: 1.6; letter-spacing: .3px; }
+.node-control-row > p { max-width: 185px; }
+.node-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.node-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; padding: 9px 13px; border: 1px solid #405139; background: #0a0e0bcc; font-size: 10px; white-space: nowrap; }
+.node-actions button:disabled { opacity: .45; cursor: default; }
+.node-actions button:hover:not(:disabled) { border-color: var(--lime); }
+.node-actions .node-reset { padding-inline: 10px; font-size: 24px; }
+.node-motion > span:first-child { font-size: 17px; }
+.node-actions .node-teleport { justify-content: space-between; min-width: 142px; gap: 24px; border-color: var(--lime); background: var(--lime); color: #15200c; font-size: 12px; }
+.node-teleport > span:last-child { font-size: 20px; line-height: 1; }
+.node-progress { position: absolute; left: 0; bottom: -1px; right: 0; height: 1px; overflow: hidden; }
+.node-progress span { display: block; height: 100%; background: var(--lime); transform: scaleX(0); transform-origin: left; }
+@media (max-width: 1100px) and (min-width: 801px) {
+  .hero { min-height: 740px; }
+  .hero-art { width: 61%; min-height: 570px; }
+  .art-coordinate { right: 30px; font-size: 8px; }
+  .node-console { left: 12%; right: 28px; }
+  .node-control-row { flex-wrap: wrap; gap: 8px; }
+  .node-control-row > p { max-width: none; }
+  .node-actions { margin-left: auto; }
+  .node-stage { bottom: 125px; }
+}
+@media (max-width: 800px) {
+  .hero-art { position: relative; inset: auto; width: 100%; min-height: 0; height: 460px; margin-top: 20px; }
+  .art-coordinate { top: 8px; right: 0; font-size: 8px; }
+  .node-stage { inset: 30px -10px 117px; }
+  .node-poster { object-fit: cover; }
+  .node-console { left: 0; right: 0; }
+  .node-control-row { flex-wrap: wrap; gap: 8px; }
+  .node-control-row > p { max-width: none; width: 100%; min-height: 15px; }
+  .node-actions { width: 100%; }
+  .node-actions .node-teleport { flex: 1; min-width: 130px; }
+  .node-readout { margin-bottom: 4px; gap: 12px; }
+  .node-readout a { font-size: 8px; }
+  .hero-bottom { margin-top: 18px; }
+}
+@media (max-width: 480px) {
+  .hero-art { height: 435px; margin-top: 16px; }
+  .node-stage { inset: 20px -18px 130px; }
+  .node-console { padding-block: 10px; }
+  .node-jumps { display: none; }
+  .node-label { font-size: 6px; letter-spacing: .4px; }
+  .node-label::before { width: 10px; }
+  .node-control-row > p { font-size: 8px; }
+  .node-actions .node-teleport { min-width: 120px; }
 }
 
 /* Both explicit and system preferences stop motion. */
