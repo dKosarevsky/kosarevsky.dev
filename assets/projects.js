@@ -43,6 +43,13 @@ export const projects = [
     description: 'An interactive Solar System atlas. Explore calculated planetary positions by date and revisit milestones in space exploration.',
   },
   {
+    id: 'zero-corpus', name: 'ZERO CORPUS', category: 'games', tags: ['PSYCHOLOGICAL HORROR', '3D', 'BROWSER GAME'],
+    preview: './assets/previews/zero-corpus.webp',
+    action: 'play',
+    url: 'https://zero-corpus.kosarevsky.dev/',
+    description: 'Enter a research building that vanished ten years ago. Follow a recording of your own voice in this psychological 3D horror game.',
+  },
+  {
     id: 'auric', name: 'AURIC OATH', category: 'games', tags: ['ACTION PLATFORMER', 'SIX MISSIONS', 'BROWSER GAME'],
     preview: './assets/previews/auric-oath.jpg',
     action: 'play',
