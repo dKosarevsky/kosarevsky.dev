@@ -32,3 +32,21 @@ test('the circular click boundary follows the rotated and translated artifact', 
   assert.equal(hitsAt(portal, -.65, .3).length, 0);
   disposeTree(portal.group);
 });
+
+test('portal optical controls accept finite bounded energy and reset invalid frames', () => {
+  const portal = createPortal({ radius: .59 });
+  try {
+    portal.update(5, 1.6, .7);
+    const uniforms = portal.mesh.material.uniforms;
+    assert.equal(uniforms.uTime.value, 5);
+    assert.equal(uniforms.uPower.value, 1.6);
+    assert.equal(uniforms.uTransfer.value, .7);
+    portal.update(NaN, Infinity, -4);
+    assert.equal(uniforms.uTime.value, 0);
+    assert.equal(uniforms.uPower.value, 0);
+    assert.equal(uniforms.uTransfer.value, 0);
+    portal.update(6, 9, 9);
+    assert.equal(uniforms.uPower.value, 2);
+    assert.equal(uniforms.uTransfer.value, 1);
+  } finally { disposeTree(portal.group); }
+});

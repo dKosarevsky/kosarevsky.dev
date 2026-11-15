@@ -155,6 +155,35 @@ test('render order avoids framebuffer feedback and restores renderer state after
   } finally { view.dispose(); }
 });
 
+test('cinematic travel energy is bounded, disappears at both endpoints, and resets between draws', () => {
+  const h = fakeRenderer(), view = createUniverseView(h.renderer), main = camera(), artifactScene = new THREE.Scene();
+  const draw = options => {
+    view.render({ artifactScene, camera: main, ...options });
+    return h.renders().at(-2).scene.children[0].material.uniforms;
+  };
+  try {
+    view.update({ camera: main, entranceMatrix: new THREE.Matrix4(), time: 0 });
+    let uniforms = draw({ energy: 5, travel: .5, time: 14 });
+    assert.equal(uniforms.uEnergy?.value, 1, 'peak energy must stay within the display envelope');
+    assert.equal(uniforms.uTravel.value, .5);
+    assert.equal(uniforms.uTime.value, 14);
+    for (const travel of [0, 1, -10, 10, NaN, Infinity]) {
+      uniforms = draw({ energy: 1, travel, time: NaN });
+      assert.equal(uniforms.uEnergy.value, 0, 'start and arrival retain the exact unwarped world');
+      assert.ok(Number.isFinite(uniforms.uTravel.value));
+      assert.equal(uniforms.uTime.value, 0);
+    }
+    uniforms = draw({ energy: Infinity, travel: .5 });
+    assert.equal(uniforms.uEnergy.value, 0);
+    uniforms = draw({ energy: 1, travel: .5 });
+    assert.equal(uniforms.uEnergy.value, 1);
+    uniforms = draw({});
+    assert.equal(uniforms.uEnergy.value, 0, 'a later still frame cannot retain a travel distortion');
+    assert.equal(uniforms.uTravel.value, 0);
+    assert.equal(h.renders().length % 4, 0, 'cinematic effects add no framebuffer passes');
+  } finally { view.dispose(); }
+});
+
 test('dispose frees both targets, the compositor, and persistent world resources once', () => {
   assert.equal(typeof createUniverseView, 'function');
   const h = fakeRenderer(), view = createUniverseView(h.renderer), artifactScene = new THREE.Scene(), main = camera();

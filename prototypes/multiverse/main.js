@@ -14,7 +14,7 @@ let node;
 
 const phaseCopy = {
   align: ['ALIGNING THE NODE', 'The shell opens. The two mouths find each other.'],
-  open: ['LINK OPEN', 'Follow the bright probe into the black core.'],
+  open: ['LINK OPEN', 'Follow the bright probe through the gateway.'],
   transfer: ['IN TRANSIT', 'One probe. Two mouths. A shortcut through spacetime.'],
   arrive: ['SIGNAL RECEIVED', 'The same probe, safely on the other side.'],
 };
