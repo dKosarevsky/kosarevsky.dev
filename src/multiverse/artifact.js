@@ -270,7 +270,7 @@ export function createArtifact() {
     for (let index = 0; index < segments.length; index += 1) {
       const panel = segments[index];
       const selected = index === hoveredIndex;
-      const lift = openingState * 0.235 + (selected ? 0.055 : 0);
+      const lift = openingState * 0.4 + (selected ? 0.055 : 0);
       panel.userData.lift = THREE.MathUtils.lerp(panel.userData.lift, lift, blend);
       panel.position.copy(panel.userData.direction).multiplyScalar(panel.userData.lift);
       const pulse = motion ? Math.sin(time * 1.2 + index * 0.6) * 0.06 : 0;

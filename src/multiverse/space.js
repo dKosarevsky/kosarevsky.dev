@@ -101,6 +101,11 @@ export function createPortal({ radius = .62, color = 0xc8ff64 } = {}) {
         light+=vec3(.6,.8,1.)*star*.8;
         float aperture=1.-smoothstep(horizon-.015,horizon,r);
         vec2 worldUv=gl_FragCoord.xy/uOutputResolution;
+        // The outer glass bends light while the central two thirds stays clear.
+        float glass=smoothstep(horizon*.65,horizon*.98,r)*(1.-smoothstep(horizon-.012,horizon,r));
+        vec2 screenRadial=normalize(vec2(dFdx(r),dFdy(r))+vec2(.000001));
+        float refraction=glass*(.7+min(uPower,1.5)*.65+uTransfer*4.);
+        worldUv=clamp(worldUv-screenRadial*refraction/max(uOutputResolution,vec2(1.)),vec2(.001),vec2(.999));
         vec3 world=texture2D(uWorld,worldUv).rgb;
         vec3 interior=mix(vec3(.0008,.0015,.002),world,uHasWorld);
         light=mix(light,interior,aperture);
@@ -127,7 +132,11 @@ export function createPortal({ radius = .62, color = 0xc8ff64 } = {}) {
   group.add(mesh);
   return {
     group, mesh,
-    update(time, power, transfer = 0) { material.uniforms.uTime.value = time; material.uniforms.uPower.value = power; material.uniforms.uTransfer.value = transfer; },
+    update(time, power, transfer = 0) {
+      material.uniforms.uTime.value = Number.isFinite(time) ? time : 0;
+      material.uniforms.uPower.value = Number.isFinite(power) ? THREE.MathUtils.clamp(power, 0, 2) : 0;
+      material.uniforms.uTransfer.value = Number.isFinite(transfer) ? THREE.MathUtils.clamp(transfer, 0, 1) : 0;
+    },
     setWorld(texture, resolution) {
       material.uniforms.uWorld.value = texture;
       material.uniforms.uHasWorld.value = texture ? 1 : 0;

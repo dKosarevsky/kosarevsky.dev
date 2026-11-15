@@ -66,14 +66,18 @@ export function createUniverse(index = 0) {
   animated.push(time => { dust.rotation.z = Math.sin(time * .025) * .025; });
 
   function planet(name, position, radius, colorA, colorB, kind = 0) {
+    const uTime = { value: 0 };
     const material = own(new THREE.ShaderMaterial({
-      uniforms: { colorA: { value: new THREE.Color(colorA) }, colorB: { value: new THREE.Color(colorB) }, kind: { value: kind } }, vertexShader: vertex,
-      fragmentShader: `varying vec3 vLocal; varying vec3 vNormal; varying vec3 vView; uniform vec3 colorA,colorB; uniform float kind;
+      uniforms: { colorA: { value: new THREE.Color(colorA) }, colorB: { value: new THREE.Color(colorB) }, kind: { value: kind }, uTime }, vertexShader: vertex,
+      fragmentShader: `varying vec3 vLocal; varying vec3 vNormal; varying vec3 vView; uniform vec3 colorA,colorB; uniform float kind,uTime;
       ${noise}
       void main(){vec3 p=normalize(vLocal);float n=fbm(p*5.);float band=sin(p.y*24.+n*8.+sin(p.x*4.)*2.);float pattern=smoothstep(-.65,.8,band)*.7+n*.3;
-      vec3 color=mix(colorA,colorB,pattern);float light=.12+.88*pow(max(0.,dot(normalize(vNormal),normalize(vec3(-.6,.5,1.)))),.75);
+      if(kind<.5){pattern=smoothstep(.37,.67,fbm(p*3.7));}
+      vec3 color=mix(colorA,colorB,pattern);float light=.06+.94*pow(max(0.,dot(normalize(vNormal),normalize(vec3(-.6,.5,1.)))),.9);
+      float cloud=pow(max(0.,fbm(p*9.+vec3(uTime*.008,0.,0.))-.48)*2.7,2.);
+      color=mix(color,vec3(.73,.88,.92),clamp(cloud,0.,.5));
       if(kind>1.5){color=mix(colorA,colorB,smoothstep(.25,.72,n+sin(p.y*18.+n*12.)*.13));light=.85;}
-      float rim=pow(1.-max(0.,dot(normalize(vNormal),normalize(vView))),3.);gl_FragColor=vec4(color*light+colorB*rim*.22,1.);
+      float rim=pow(1.-max(0.,dot(normalize(vNormal),normalize(vView))),3.);gl_FragColor=vec4(color*light+colorB*rim*.4,1.);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
       }`,
@@ -81,13 +85,13 @@ export function createUniverse(index = 0) {
     const body = mesh(sphere, material, position, radius); body.name = name;
     const atmosphereMaterial = own(new THREE.ShaderMaterial({
       uniforms: { color: { value: new THREE.Color(colorB) } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, vertexShader: vertex,
-      fragmentShader: `varying vec3 vNormal; varying vec3 vView; uniform vec3 color;void main(){float rim=pow(1.-max(0.,dot(normalize(vNormal),normalize(vView))),3.);gl_FragColor=vec4(color,rim*.29);
+      fragmentShader: `varying vec3 vNormal; varying vec3 vView; uniform vec3 color;void main(){float rim=pow(1.-max(0.,dot(normalize(vNormal),normalize(vView))),3.);gl_FragColor=vec4(color*1.6,rim*.4);
       #include <tonemapping_fragment>
       #include <colorspace_fragment>
       }`,
     }));
-    mesh(sphere, atmosphereMaterial, position, radius * 1.035).name = `${name} atmosphere`;
-    animated.push(time => { body.rotation.y = time * .014; body.rotation.z = -.18; });
+    mesh(sphere, atmosphereMaterial, position, radius * 1.065).name = `${name} atmosphere`;
+    animated.push(time => { body.rotation.y = time * .014; body.rotation.z = -.18; uTime.value = time; });
     return body;
   }
 
@@ -96,8 +100,41 @@ export function createUniverse(index = 0) {
     object.rotation.set(...rotation); object.name = name; return object;
   }
 
+  function flowDisc(name, position, inner, outer, rotation, color, kind = 0) {
+    const uTime = { value: 0 };
+    const material = own(new THREE.ShaderMaterial({
+      uniforms: { uTime, uInner: { value: inner }, uOuter: { value: outer }, uColor: { value: new THREE.Color(color) }, uKind: { value: kind } },
+      transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+      vertexShader: `varying vec3 vLocal;void main(){vLocal=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      fragmentShader: `varying vec3 vLocal;uniform float uTime,uInner,uOuter,uKind;uniform vec3 uColor;
+      ${noise}
+      void main(){float r=length(vLocal.xy);float t=(r-uInner)/(uOuter-uInner);float a=atan(vLocal.y,vLocal.x);
+      float edge=smoothstep(0.,.035,t)*(1.-smoothstep(.75,1.,t));
+      float orbit=a-uTime*(.16+.6/(r*r));
+      float filaments=.6+.4*sin(r*92.+sin(orbit*7.+r*5.)*1.8);
+      float turbulence=fbm(vec3(cos(orbit)*r*4.,sin(orbit)*r*4.,r*3.));
+      float strength=edge*(.3+filaments*.6+turbulence*.5);
+      vec3 color=uColor;
+      if(uKind>1.5){float hot=pow(1.-t,2.);color=mix(uColor,vec3(1.,.88,.6),hot);strength*=1.4+hot*2.1;}
+      else if(uKind<.5){strength*=.18+.82*pow(.5+.5*sin(a*36.-uTime*.5),8.);}
+      gl_FragColor=vec4(color*strength,edge*.8);
+      #include <tonemapping_fragment>
+      #include <colorspace_fragment>
+      }`,
+    }));
+    const disc = mesh(own(new THREE.RingGeometry(inner, outer, 160, 12)), material, position);
+    disc.name = name; disc.rotation.set(...rotation);
+    animated.push(time => { uTime.value = time; });
+    return disc;
+  }
+
   if (index === 0) {
-    planet('Jade world', [-.78, .43, -6.2], 1.32, 0x062c2a, 0xa5db83);
+    const position = [-.78, .43, -6.2];
+    planet('Jade world', position, 1.32, 0x062c2a, 0xa5db83);
+    flowDisc('Orbital computation ring', position, 2.15, 2.5, [.82, -.22, .3], 0x8bffba);
+    const meridian = ring('Lattice meridian', position, 2.48, .012, 0xb5ffc9, [.24, 1.08, -.4], .64, Math.PI * 1.6);
+    const ecliptic = ring('Lattice ecliptic', position, 2.78, .009, 0x6bdab7, [1.22, .1, -.23], .4, Math.PI * 1.8);
+    animated.push(time => { meridian.rotation.z = -.4 + time * .018; ecliptic.rotation.z = -.23 - time * .012; });
     const crystalGeometry = own(new THREE.OctahedronGeometry(1, 0));
     const crystalMaterial = basic(0x9ce4a8, .35, true);
     const crystal = mesh(crystalGeometry, crystalMaterial, [3.5, 1.3, -9.6], 1.95);
@@ -122,10 +159,11 @@ export function createUniverse(index = 0) {
     cloud('Cold nebular depth', 340, () => { const t = random() * TAU; const r = 3 + random() * 5; return [Math.cos(t) * r, Math.sin(t) * r * .4 + 1, -13 - random() * 12]; }, 0x2b8062, .8, .12);
   } else if (index === 1) {
     const position = [-.65, .32, -6.6];
-    planet('Mirror giant', position, 1.38, 0x172f68, 0x91b6ec);
+    planet('Mirror giant', position, 1.38, 0x102c68, 0x9dc7ff, 1);
     const ringRotation = [1.03, .35, -.34];
     ring('Mirror inner ring', position, 1.95, .022, 0xbfc9ff, ringRotation, .7);
     ring('Mirror outer ring', position, 2.24, .012, 0x7a8de0, ringRotation, .55);
+    flowDisc('Crystalline ring flow', position, 1.65, 2.52, ringRotation, 0x8da8e8, 1);
     const orbit = new THREE.Group(); orbit.position.set(...position); orbit.rotation.set(...ringRotation); group.add(orbit);
     const ringGeometry = own(new THREE.RingGeometry(1.72, 2.35, 128, 1));
     mesh(ringGeometry, own(new THREE.MeshBasicMaterial({ color: 0x8c92c6, transparent: true, opacity: .16, side: THREE.DoubleSide, depthWrite: false })), [0, 0, 0], 1, orbit);
@@ -135,11 +173,19 @@ export function createUniverse(index = 0) {
       const t = random() * TAU * 1.4, r = 2.8 + t * .64 + (random() - .5) * 1.8;
       return [Math.cos(t) * r + 1, Math.sin(t) * r * .6 + (random() - .5), -15 + Math.cos(t) * 3 + (random() - .5) * 4];
     }, 0x715bb7, 1.1, .22);
+    cloud('Ionized aurora', 220, () => {
+      const t = random() * TAU, radius = 6 + random() * 5;
+      return [Math.cos(t) * radius, Math.sin(t) * radius * .48 + 2, -18 - random() * 10];
+    }, 0x395fc5, 2.8, .13);
   } else {
     const position = [-.8, .35, -7.3];
-    planet('Ember star', position, 1.6, 0xd2390e, 0xffd27e, 2);
-    mesh(sphere, basic(0x100906), [-.49, .47, -6.06], 1.17).name = 'Eclipsing moon';
-    for (let orbit = 0; orbit < 3; orbit++) ring('Coronal filament', position, 1.76 + orbit * .18, .008, 0xff9d4b, [.1, -.15, orbit * .6], .3 - orbit * .06);
+    mesh(sphere, basic(0x010101), position, 1.17).name = 'Event horizon';
+    flowDisc('Accretion disc', position, 1.24, 3.38, [1.18, -.12, -.22], 0xff7636, 2);
+    ring('Photon ring', position, 1.205, .026, 0xffd699, [0, 0, 0], .95);
+    const lens = ring('Lensed far accretion flow', [position[0], position[1], position[2] - .08], 1.48, .065, 0xffb05c, [0, 0, -.22], .46, Math.PI);
+    lens.scale.y = 1.08;
+    const echo = ring('Secondary photon echo', position, 1.26, .009, 0xffe9c4, [0, 0, 0], .64);
+    animated.push(time => { echo.material.opacity = .56 + Math.sin(time * .6) * .08; });
     planet('Burnt outer planet', [4.1, 1.45, -11], 2.05, 0x301b15, 0xaa6540);
     const asteroidGeometry = own(new THREE.IcosahedronGeometry(1, 0));
     const asteroidMaterial = basic(0x73513b);

@@ -5,6 +5,7 @@ import { createTransit, createGesture } from './state.js';
 import { createSpace, createPortal, disposeTree } from './space.js';
 import { createUniverseView } from './portal-view.js';
 import { UNIVERSES } from './universes.js';
+import { createFluxField, sampleCinematics } from './cinematics.js';
 
 const clamp = THREE.MathUtils.clamp;
 const ease = x => { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); };
@@ -45,7 +46,8 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   const artifact = createArtifact();
   artifact.group.rotation.set(BASE_X, BASE_Y, 0);
   const space = createSpace({ includeStars: false });
-  scene.add(space.group, artifact.group);
+  const flux = createFluxField();
+  scene.add(space.group, flux.group, artifact.group);
   const entry = createPortal({ radius: .59 });
   entry.group.position.set(0, 0, 1.445);
   entry.mesh.userData.core = true;
@@ -96,7 +98,7 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
   catch (error) { disposeTree(scene); environment.dispose(); renderer.dispose(); throw error; }
   entry.setWorld(worlds.texture, worlds.outputResolution);
 
-  const transit = createTransit({ universeCount: UNIVERSES.length });
+  const transit = createTransit({ duration: 3.2, universeCount: UNIVERSES.length });
   const gesture = createGesture();
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -185,6 +187,8 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     if (!canRender()) return;
     const state = transit.snapshot();
     const p = state.progress;
+    const cinematic = sampleCinematics(p, state.active);
+    const travelProgress = state.active ? ease((p - .58) / .36) : 0;
     const opening = state.active ? ease(p / .23) * (1 - ease((p - .8) / .2)) : 0;
     if (state.active) {
       artifact.group.quaternion.copy(startRotation).slerp(baseRotation, ease(p / .23));
@@ -206,6 +210,10 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     exit.update(time, .08 + opening * 1.1, exitTransfer);
     exitRim.material.emissiveIntensity = .3 + opening * 1.5;
     bounce.color.set(worlds.currentPreset.accent);
+    bounce.intensity = 2.4 + cinematic.energy * 3.4;
+    rim.color.set(worlds.destinationPreset.accent);
+    rim.intensity = 4.6 + cinematic.energy * 2.2;
+    flux.update({ time, ...cinematic, color: worlds.destinationPreset.accent });
     space.update(time);
     scene.updateMatrixWorld(true);
     entry.group.getWorldPosition(entryWorld);
@@ -245,9 +253,11 @@ export function createNode({ canvas, motion = true, onReady, onStatus, onFrame, 
     probeLight.intensity = .9 + (entryTransfer + exitTransfer) * 1.25;
     if (motion) { probeBody.rotation.y = time * .7; probeBand.rotation.z = time * .35; probe.position.y += Math.sin(time * 1.2) * .015 * (state.active ? 0 : 1); }
     try {
-      updateWorldCameras(state.active ? ease((p - .58) / .36) : 0);
+      updateWorldCameras(travelProgress);
       const mouth = project(entryWorld);
-      worlds.render({ artifactScene: scene, camera, reveal: state.active ? ease((p - .58) / .36) : 0, center: { x: mouth.x / width, y: mouth.y / height } });
+      worlds.render({ artifactScene: scene, camera, reveal: travelProgress,
+        energy: cinematic.energy, travel: travelProgress, time,
+        center: { x: mouth.x / width, y: mouth.y / height } });
       if (shaderFailed) {
         fail(new Error('The portal shader could not compile.'));
         return;
